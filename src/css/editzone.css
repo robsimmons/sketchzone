@@ -1,0 +1,469 @@
+/** DIMENSIONS **/
+
+body {
+  --sessionzone-mono: 'Fira Mono', monospace;
+  --sessionzone-ui: 'Fira Sans Condensed', sans-serif;
+
+  --sessionzone-radius: 8px;
+  --sessionzone-button-size: 2rem;
+
+  --sessionzone-outer-padding: 12px;
+  --sessionzone-small-padding: 8px;
+  --sessionzone-large-padding: 16px;
+  --sessionzone-tab-bottom-padding: 10px;
+  --sessionzone-fixed-padding: 16px;
+
+  --sessionzone-outer-padding-narrow: 4px;
+  --sessionzone-small-padding-narrow: 6px;
+  --sessionzone-large-padding-narrow: 10px;
+
+  --sessionzone-session-height: calc(
+    100vh - 2 * var(--sessionzone-outer-padding) - 2 * var(--sessionzone-small-padding) -
+      var(--sessionzone-button-size) - var(--sessionzone-tab-bottom-padding)
+  );
+}
+@media (max-width: 650px) {
+  body {
+    --sessionzone-outer-padding: var(--sessionzone-outer-padding-narrow);
+    --sessionzone-small-padding: var(--sessionzone-small-padding-narrow);
+    --sessionzone-large-padding: var(--sessionzone-large-padding-narrow);
+  }
+}
+
+/** THEMES **/
+
+body {
+  /**** Dark mode ****/
+  /* Zone 1 is the area where config and codemirror lives */
+  --sessionzone-dark-1-background: oklch(27% 0 0);
+  --sessionzone-dark-1-text: oklch(67% 0 0);
+  --sessionzone-dark-1-active-button-background: oklch(32% 0 0);
+  --sessionzone-dark-1-active-button-text: oklch(72% 0 0);
+  --sessionzone-dark-1-hint-text: oklch(47% 0 0);
+
+  /* Zone 2 is the area where the session tab switcher lives */
+  --sessionzone-dark-2-background: oklch(37% 0 0);
+  --sessionzone-dark-2-text: oklch(77% 0 0);
+  --sessionzone-dark-2-active-button-background: oklch(42% 0 0);
+  --sessionzone-dark-2-active-button-text: oklch(82% 0 0);
+
+  /* Color of the modal background and drop shadows */
+  --sessionzone-dark-shadow: oklch(72% 0 0);
+  --sessionzone-dark-overlay: oklch(72% 0 0 / 30%);
+
+  /**** Light mode ****/
+  --sessionzone-light-1-background: oklch(97% 0 0);
+  --sessionzone-light-1-text: oklch(57% 0 0);
+  --sessionzone-light-1-active-button-background: oklch(92% 0 0);
+  --sessionzone-light-1-active-button-text: oklch(52% 0 0);
+  --sessionzone-light-1-hint-text: oklch(77% 0 0);
+
+  --sessionzone-light-2-background: oklch(87% 0 0);
+  --sessionzone-light-2-text: oklch(47% 0 0);
+  --sessionzone-light-2-active-button-background: oklch(82% 0 0);
+  --sessionzone-light-2-active-button-text: oklch(42% 0 0);
+
+  --sessionzone-light-shadow: oklch(52% 0 0);
+  --sessionzone-light-overlay: oklch(52% 0 0 / 30%);
+
+  /**** Calculated ****/
+  --sessionzone-box-shadow: 0 0 0.3rem 0 var(--sessionzone-shadow);
+}
+/* Light mode as a default */
+body {
+  --sessionzone-1-background: var(--sessionzone-light-1-background);
+  --sessionzone-1-text: var(--sessionzone-light-1-text);
+  --sessionzone-1-active-button-background: var(--sessionzone-light-1-active-button-background);
+  --sessionzone-1-active-button-text: var(--sessionzone-light-1-active-button-text);
+  --sessionzone-1-hint-text: var(--sessionzone-light-1-hint-text);
+
+  --sessionzone-2-background: var(--sessionzone-light-2-background);
+  --sessionzone-2-text: var(--sessionzone-light-2-text);
+  --sessionzone-2-active-button-background: var(--sessionzone-light-2-active-button-background);
+  --sessionzone-2-active-button-text: var(--sessionzone-light-2-active-button-text);
+
+  --sessionzone-shadow: var(--sessionzone-light-shadow);
+  --sessionzone-overlay: var(--sessionzone-light-overlay);
+}
+
+/* Dark mode via media query */
+@media (prefers-color-scheme: dark) {
+  body {
+    --sessionzone-1-background: var(--sessionzone-dark-1-background);
+    --sessionzone-1-text: var(--sessionzone-dark-1-text);
+    --sessionzone-1-active-button-background: var(--sessionzone-dark-1-active-button-background);
+    --sessionzone-1-active-button-text: var(--sessionzone-dark-1-active-button-text);
+    --sessionzone-1-hint-text: var(--sessionzone-dark-1-hint-text);
+
+    --sessionzone-2-background: var(--sessionzone-dark-2-background);
+    --sessionzone-2-text: var(--sessionzone-dark-2-text);
+    --sessionzone-2-active-button-background: var(--sessionzone-dark-2-active-button-background);
+    --sessionzone-2-active-button-text: var(--sessionzone-dark-2-active-button-text);
+
+    --sessionzone-shadow: var(--sessionzone-dark-shadow);
+    --sessionzone-overlay: var(--sessionzone-dark-overlay);
+  }
+}
+
+/* Light mode via explicit selection */
+body.theme-light {
+  --sessionzone-1-background: var(--sessionzone-light-1-background);
+  --sessionzone-1-text: var(--sessionzone-light-1-text);
+  --sessionzone-1-active-button-background: var(--sessionzone-light-1-active-button-background);
+  --sessionzone-1-active-button-text: var(--sessionzone-light-1-active-button-text);
+  --sessionzone-1-hint-text: var(--sessionzone-light-1-hint-text);
+
+  --sessionzone-2-background: var(--sessionzone-light-2-background);
+  --sessionzone-2-text: var(--sessionzone-light-2-text);
+  --sessionzone-2-active-button-background: var(--sessionzone-light-2-active-button-background);
+  --sessionzone-2-active-button-text: var(--sessionzone-light-2-active-button-text);
+
+  --sessionzone-shadow: var(--sessionzone-light-shadow);
+  --sessionzone-overlay: var(--sessionzone-light-overlay);
+}
+
+/* Dark mode via explicit selection */
+body.theme-dark {
+  --sessionzone-1-background: var(--sessionzone-dark-1-background);
+  --sessionzone-1-text: var(--sessionzone-dark-1-text);
+  --sessionzone-1-active-button-background: var(--sessionzone-dark-1-active-button-background);
+  --sessionzone-1-active-button-text: var(--sessionzone-dark-1-active-button-text);
+  --sessionzone-1-hint-text: var(--sessionzone-dark-1-hint-text);
+
+  --sessionzone-2-background: var(--sessionzone-dark-2-background);
+  --sessionzone-2-text: var(--sessionzone-dark-2-text);
+  --sessionzone-2-active-button-background: var(--sessionzone-dark-2-active-button-background);
+  --sessionzone-2-active-button-text: var(--sessionzone-dark-2-active-button-text);
+
+  --sessionzone-shadow: var(--sessionzone-dark-shadow);
+  --sessionzone-overlay: var(--sessionzone-dark-overlay);
+}
+
+/** LAYOUT **/
+
+/* Roots - body and main */
+body {
+  font-family: var(--sessionzone-ui);
+  background-color: var(--sessionzone-1-background);
+  color: var(--sessionzone-1-text);
+
+  /* This gets overwritten by JavaScript */
+  --sessionzone-text-editor-panel-width: 1fr;
+}
+main {
+  width: 100%;
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: calc(var(--sessionzone-button-size) + 3 * var(--sessionzone-small-padding)) 1fr;
+}
+
+/* Buttons
+ * The default behavior of buttons is to use the zone 2 background, which makes the
+ * buttons very obvious. By setting .zone1 on a parent element, buttons become the same
+ * color as the zone1 background, which is desirable for situations like the left-had
+ * bar and the inspector controller where the context makes the fact that this is a 
+ * button group obvious enough. */
+button {
+  border: 0;
+  border-radius: var(--sessionzone-radius);
+  height: var(--sessionzone-button-size);
+  padding-inline: var(--sessionzone-small-padding);
+  background-color: var(--sessionzone-2-background);
+  color: var(--sessionzone-2-text);
+  display: flex;
+  align-items: center;
+  gap: var(--sessionzone-small-padding);
+}
+button:hover {
+  background-color: var(--sessionzone-2-active-button-background);
+  color: var(--sessionzone-2-active-button-text);
+}
+.zone1 button {
+  background-color: var(--sessionzone-1-background);
+  color: var(--sessionzone-1-text);
+}
+.zone1 button:hover {
+  background-color: var(--sessionzone-1-active-button-background);
+  color: var(--sessionzone-1-active-button-text);
+}
+
+/* Config area outside of the rounded rect in zone 1 */
+.sessionzone-config {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-block: var(--dk-small-padding);
+  align-items: stretch;
+}
+
+/* The rounded rect contains both the header and the active session */
+.sessionzone-container {
+  border-radius: calc(var(--sessionzone-radius) + var(--sessionzone-small-padding));
+  padding: var(--sessionzone-small-padding);
+  display: grid;
+  grid-template-rows: 1fr var(--sessionzone-session-height);
+  background-color: var(--sessionzone-2-background);
+  color: var(--sessionzone-2-text);
+  margin: var(--sessionzone-outer-padding) var(--sessionzone-outer-padding)
+    var(--sessionzone-outer-padding) 0;
+}
+
+/* Header */
+.sessionzone-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--sessionzone-small-padding);
+}
+.sessionzone-logo {
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+  margin-block: auto;
+  padding-bottom: var(--sessionzone-tab-bottom-padding);
+  padding-right: var(--sessionzone-large-padding);
+}
+
+.sessionzone-tabs {
+  display: flex;
+  flex-direction: row;
+  overflow-x: scroll;
+  overscroll-behavior-x: none;
+  gap: var(--sessionzone-small-padding);
+}
+.sessionzone-tab {
+  display: flex;
+  flex-direction: row;
+  min-width: fit-content;
+  padding-bottom: var(--sessionzone-tab-bottom-padding);
+}
+.sessionzone-tab-add {
+  position: sticky;
+  right: 0;
+}
+.sessionzone-tab-left {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  padding-left: var(--sessionzone-large-padding);
+}
+.sessionzone-tab-solo {
+  padding-inline: var(--sessionzone-large-padding);
+}
+.sessionzone-tab-close {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.sessionzone-tab.zone2 .sessionzone-tab-close {
+  color: transparent;
+}
+.sessionzone-tab.zone2:hover .sessionzone-tab-close {
+  color: var(--sessionzone-2-text);
+}
+.sessionzone-tab.zone2:hover .sessionzone-tab-close:hover {
+  color: var(--sessionzone-2-text);
+}
+
+/* Left-side configuration menu */
+.sessionzone-config-menu {
+  display: flex;
+  flex-direction: column;
+  padding: var(--sessionzone-small-padding);
+  gap: var(--sessionzone-small-padding);
+}
+.sessionzone-config-menu button {
+  width: calc(var(--sessionzone-button-size) + var(--sessionzone-small-padding));
+  height: calc(var(--sessionzone-button-size) + var(--sessionzone-small-padding));
+}
+.sessionzone-config-menu svg {
+  margin: auto;
+}
+.sessionzone-config-load-selections {
+  overflow-y: scroll;
+}
+.sessionzone-config-load-selections button {
+  padding-block: var(--sessionzone-small-padding);
+  height: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+}
+.sessionzone-config-load-selections button div {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow-x: hidden;
+  width: 100%;
+  text-align: left;
+}
+.sessionzone-config-load-selections button div.time {
+  font-size: 0.8rem;
+  font-style: italic;
+}
+@media (prefers-color-scheme: dark) {
+  #sessionzone-config-to-dark {
+    display: none;
+  }
+}
+@media (prefers-color-scheme: light) {
+  #sessionzone-config-to-light {
+    display: none;
+  }
+}
+.theme-dark #sessionzone-config-to-light {
+  display: initial;
+}
+.theme-dark #sessionzone-config-to-dark {
+  display: none;
+}
+.theme-light #sessionzone-config-to-light {
+  display: none;
+}
+.theme-light #sessionzone-config-to-dark {
+  display: initial;
+}
+
+/* Active Session */
+#sessionzone-active-session {
+  display: grid; /* display: none;  JS sets as 'grid' to avoid resize flash */
+  grid-template-columns: var(--sessionzone-text-editor-panel-width) var(--sessionzone-fixed-padding) minmax(
+      250px,
+      1fr
+    );
+  grid-template-areas: 'editor divider viewer';
+  --sessionzone-text-editor-height: var(--sessionzone-session-height);
+}
+
+/* Active Session Part 1: Editor */
+#sessionzone-codemirror-root {
+  background-color: var(--sessionzone-1-background);
+  color: var(--sessionzone-1-text);
+  box-shadow: var(--sessionzone-box-shadow);
+  border-radius: var(--sessionzone-radius);
+  padding-left: var(--sessionzone-small-padding);
+  display: grid;
+  grid-area: editor;
+}
+#sessionzone-codemirror-root .cm-editor {
+  height: var(--sessionzone-text-editor-height);
+}
+
+/* Active Session Part 2: Divider */
+#sessionzone-divider {
+  cursor: ew-resize;
+  grid-area: divider;
+}
+
+/* Active Session Part 3: Inspector */
+#sessionzone-inspector-controller {
+  background-color: var(--sessionzone-1-background);
+  height: var(--sessionzone-button-size);
+  box-shadow: var(--sessionzone-box-shadow);
+  border-radius: var(--sessionzone-radius);
+  display: flex;
+  flex-direction: row;
+  overflow-x: hidden;
+}
+
+/* Active session: Mobile view */
+#sessionzone-inspector-view,
+#sessionzone-inspector-inspect {
+  display: none;
+}
+@media (max-width: 650px) {
+  #sessionzone-inspector-view,
+  #sessionzone-inspector-inspect {
+    display: inherit;
+  }
+
+  #sessionzone-divider {
+    display: none;
+  }
+
+  div#sessionzone-active-session {
+    grid-template-columns: 1fr;
+  }
+  div#sessionzone-active-session.active-session-is-showing-editor {
+    grid-template-areas: 'viewer' 'editor';
+    gap: var(--sessionzone-small-padding);
+    --sessionzone-text-editor-height: calc(
+      var(--sessionzone-session-height) - var(--sessionzone-button-size) -
+        var(--sessionzone-small-padding)
+    );
+  }
+  div#sessionzone-active-session.active-session-is-showing-inspector {
+    grid-template-areas: 'viewer';
+  }
+
+  div#sessionzone-active-session.active-session-is-showing-editor #sessionzone-inspector-contents {
+    display: none;
+  }
+  div#sessionzone-active-session.active-session-is-showing-inspector #sessionzone-codemirror-root {
+    display: none;
+  }
+
+  div#sessionzone-active-session.active-session-is-showing-inspector #sessionzone-inspector-load {
+    display: none;
+  }
+  div#sessionzone-active-session.active-session-is-showing-editor #sessionzone-inspector-view {
+    display: none;
+  }
+  div#sessionzone-active-session.active-session-is-showing-inspector
+    #sessionzone-inspector-inspect {
+    display: none;
+  }
+}
+
+/* Radix UI Dialog Modals */
+.sessionzone-dialog-overlay {
+  background-color: var(--sessionzone-overlay);
+  position: fixed;
+  inset: 0;
+  overflow-y: scroll;
+}
+.sessionzone-dialog-content {
+  background-color: var(--sessionzone-1-background);
+  border-radius: 6px;
+  box-shadow: var(--sessionzone-box-shadow);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100vw - 2 * var(--sessionzone-outer-padding) - 2 * var(--sessionzone-large-padding));
+  max-width: 450px;
+  max-height: calc(
+    100vh - 2 * var(--sessionzone-outer-padding) - 2 * var(--sessionzone-large-padding)
+  );
+  padding: var(--sessionzone-fixed-padding);
+  display: flex;
+  flex-direction: column;
+}
+.sessionzone-dialog-content:focus {
+  outline: none;
+}
+.sessionzone-dialog-content p {
+  padding-bottom: var(--sessionzone-fixed-padding);
+}
+
+.sessionzone-dialog-content.sessionzone-config-load {
+  max-width: 800px;
+}
+
+/* Codemirror styling */
+.cm-editor.cm-focused {
+  outline: none;
+}
+.cm-editor .cm-scroller .cm-content {
+  caret-color: var(--sessionzone-1-text);
+}
+.cm-editor .cm-content {
+  font-family: var(--sessionzone-mono);
+}
+.cm-gutter.cm-lineNumbers {
+  width: 100%;
+}
+.cm-editor .cm-gutters {
+  background: transparent;
+  width: 2rem;
+  border: none;
+  font-family: var(--sessionzone-ui);
+  color: var(--sessionzone-1-hint-text);
+}

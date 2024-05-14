@@ -262,7 +262,7 @@ button:hover {
 /* Header */
 #sketchzone-header {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr max-content;
   gap: var(--sketchzone-small-padding);
 }
 #sketchzone-logo {
@@ -272,10 +272,9 @@ button:hover {
   padding-bottom: var(--sketchzone-tab-bottom-padding);
   padding-right: var(--sketchzone-large-padding);
 }
-
 #sketchzone-tabs {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto minmax(max-content, 1fr);
   gap: var(--sketchzone-small-padding);
 }
 .sketchzone-current-tabs {
@@ -287,7 +286,7 @@ button:hover {
 .sketchzone-tab {
   display: flex;
   flex-direction: row;
-  min-width: fit-content;
+  min-width: max-content;
   padding-bottom: var(--sketchzone-tab-bottom-padding);
 }
 .sketchzone-tab-add {

@@ -10,9 +10,17 @@ interface Props {
   switchToIndex: (index: number) => void;
   deleteIndex: (index: number) => void;
   create: () => void;
+  documentName: string;
 }
 
-export default function SketchTabs({ tabs, switchToIndex, deleteIndex, create, iconSize }: Props) {
+export default function SketchTabs({
+  tabs,
+  switchToIndex,
+  deleteIndex,
+  create,
+  iconSize,
+  documentName,
+}: Props) {
   const canClose = tabs.sketches.length > 1;
   return (
     <>
@@ -20,12 +28,11 @@ export default function SketchTabs({ tabs, switchToIndex, deleteIndex, create, i
         {tabs.sketches.map((sketch, index) => (
           <div
             key={`${sketch.key}`}
-            className={`sketchzone-tab ${
-              index === tabs.displayedSketchIndex ? 'zone1' : 'zone2'
-            } `}
+            className={`sketchzone-tab ${index === tabs.displayedSketchIndex ? 'zone1' : 'zone2'} `}
           >
             <button
               className={canClose ? 'sketchzone-tab-left' : 'sketchzone-tab-solo'}
+              aria-label="Switch to this tab"
               onClick={(event) => {
                 event.preventDefault();
                 switchToIndex(index);
@@ -51,6 +58,7 @@ export default function SketchTabs({ tabs, switchToIndex, deleteIndex, create, i
 
       <div className="sketchzone-tab sketchzone-tab-add">
         <button
+          title={`Create a new ${documentName}`}
           onClick={(event) => {
             event.preventDefault();
             create();

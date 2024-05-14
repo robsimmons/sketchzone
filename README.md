@@ -36,7 +36,8 @@ const codemirrorExtensions = [
 
 These examples are all built on Glitch as a static site that uses [Vite](https://vitejs.dev/) to roll up sessionzone's dependencies on React and Codemirror.
 
-- [Simplest possible example](https://glitch.com/edit/?#!/sketchzone-simplest)
+- [Simplest possible example](https://glitch.com/edit/?#!/sketchzone-simplest?path=index.js) - almost simple enough to be deceiving, uses defaults for everything. Loading a document just displays its length.
+- []
 
 # Structure
 

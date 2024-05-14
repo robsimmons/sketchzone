@@ -12,7 +12,7 @@ The sketchzone package is intended to encapsulate a bunch of "price of entry" qu
 - A mobile-friendly mode that switches between the editor and inspector
 - Light/dark mode
 
-This is fundamentally made for an audience of one --- me --- so [reach out](https://social.wub.site/@simrob) if you'd like to use it yourself and run into trouble. sketchzone is currently licensed under the GPL-3 and CC-BY-NC-SA licenses (whichever you prefer), but if neither of those licenses work for you [let me know](https://social.wub.site/@simrob).
+This is fundamentally made for an audience of one (me), but [reach out](https://social.wub.site/@simrob) if you'd like to use it yourself and run into trouble. sketchzone is currently licensed under the GPL-3 and CC-BY-NC-SA licenses (whichever you prefer), but if neither of those licenses work for you [let me know](https://social.wub.site/@simrob).
 
 ## Implementing an inspector
 

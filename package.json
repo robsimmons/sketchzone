@@ -3,6 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "lib/main.js",
+  "types": "lib/main.d.ts",
+  "homepage": "https://github.com/robsimmons/sketchzone",
+  "repository": {
+    "type": "git",
+    "url": "https://git.sr.ht/~robsimmons/sketchzone.git"
+  },
+  "license": "GPL-3.0-only",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -13,11 +21,11 @@
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
     "typescript": "^5.2.2",
-    "@codemirror/commands": "^6.5.0",
     "vite": "^5.2.0",
     "@vitejs/plugin-react-swc": "^3.6.0"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.5.0",
     "@codemirror/state": "^6.4.1",
     "@codemirror/view": "^6.26.3",
     "@radix-ui/react-dialog": "^1.0.5",

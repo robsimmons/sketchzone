@@ -1,0 +1,11 @@
+*.test.js
+
+/.github
+/dist
+/demo
+/src
+
+/.prettierrc
+/index.html
+/tsconfig*.json
+/vite.config.ts

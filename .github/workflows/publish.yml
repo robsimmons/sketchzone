@@ -16,11 +16,7 @@ jobs:
         with:
           node-version: 18.x
           registry-url: 'https://registry.npmjs.org'
-      - name: Install node modules
-        run: npm ci
-        run: npm run dev
 
-      - name: Build
-        env:
-          NODE_AUTH_TOKEN: "${{ secrets.NPM_PUBLISH_TOKEN }}"
-        run: npm publish
+      - run: npm ci
+      - run: npm run dev
+      - run: npm publish

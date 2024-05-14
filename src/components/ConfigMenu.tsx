@@ -9,7 +9,7 @@ import {
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import React from 'react';
 
-import { SKETCHES_DB, SketchObject } from '../storage.ts';
+import { SKETCHES_DB, SketchObject } from '../storage.js';
 
 interface Props {
   db: IDBDatabase;

@@ -168,6 +168,7 @@ async function setupEditorInteractions(
           iconSize: ICON_SIZE,
           switchToIndex,
           deleteIndex,
+          documentName,
           create: createSketch,
         }),
       ),

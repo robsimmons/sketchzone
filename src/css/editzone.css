@@ -1,32 +1,32 @@
 /** DIMENSIONS **/
 
 body {
-  --sessionzone-mono: 'Fira Mono', monospace;
-  --sessionzone-ui: 'Fira Sans Condensed', sans-serif;
+  --sketchzone-mono: 'Fira Mono', monospace;
+  --sketchzone-ui: 'Fira Sans Condensed', sans-serif;
 
-  --sessionzone-radius: 8px;
-  --sessionzone-button-size: 2rem;
+  --sketchzone-radius: 8px;
+  --sketchzone-button-size: 2rem;
 
-  --sessionzone-outer-padding: 12px;
-  --sessionzone-small-padding: 8px;
-  --sessionzone-large-padding: 16px;
-  --sessionzone-tab-bottom-padding: 10px;
-  --sessionzone-fixed-padding: 16px;
+  --sketchzone-outer-padding: 12px;
+  --sketchzone-small-padding: 8px;
+  --sketchzone-large-padding: 16px;
+  --sketchzone-tab-bottom-padding: 10px;
+  --sketchzone-fixed-padding: 16px;
 
-  --sessionzone-outer-padding-narrow: 4px;
-  --sessionzone-small-padding-narrow: 6px;
-  --sessionzone-large-padding-narrow: 10px;
+  --sketchzone-outer-padding-narrow: 4px;
+  --sketchzone-small-padding-narrow: 6px;
+  --sketchzone-large-padding-narrow: 10px;
 
-  --sessionzone-session-height: calc(
-    100vh - 2 * var(--sessionzone-outer-padding) - 2 * var(--sessionzone-small-padding) -
-      var(--sessionzone-button-size) - var(--sessionzone-tab-bottom-padding)
+  --sketchzone-sketch-height: calc(
+    100vh - 2 * var(--sketchzone-outer-padding) - 2 * var(--sketchzone-small-padding) -
+      var(--sketchzone-button-size) - var(--sketchzone-tab-bottom-padding)
   );
 }
 @media (max-width: 650px) {
   body {
-    --sessionzone-outer-padding: var(--sessionzone-outer-padding-narrow);
-    --sessionzone-small-padding: var(--sessionzone-small-padding-narrow);
-    --sessionzone-large-padding: var(--sessionzone-large-padding-narrow);
+    --sketchzone-outer-padding: var(--sketchzone-outer-padding-narrow);
+    --sketchzone-small-padding: var(--sketchzone-small-padding-narrow);
+    --sketchzone-large-padding: var(--sketchzone-large-padding-narrow);
   }
 }
 
@@ -35,126 +35,126 @@ body {
 body {
   /**** Dark mode ****/
   /* Zone 1 is the area where config and codemirror lives */
-  --sessionzone-dark-1-background: oklch(27% 0 0);
-  --sessionzone-dark-1-text: oklch(67% 0 0);
-  --sessionzone-dark-1-active-button-background: oklch(32% 0 0);
-  --sessionzone-dark-1-active-button-text: oklch(72% 0 0);
-  --sessionzone-dark-1-hint-text: oklch(47% 0 0);
+  --sketchzone-dark-1-background: oklch(27% 0 0);
+  --sketchzone-dark-1-text: oklch(67% 0 0);
+  --sketchzone-dark-1-active-button-background: oklch(32% 0 0);
+  --sketchzone-dark-1-active-button-text: oklch(72% 0 0);
+  --sketchzone-dark-1-hint-text: oklch(47% 0 0); /* codemirror line numbers */
 
-  /* Zone 2 is the area where the session tab switcher lives */
-  --sessionzone-dark-2-background: oklch(37% 0 0);
-  --sessionzone-dark-2-text: oklch(77% 0 0);
-  --sessionzone-dark-2-active-button-background: oklch(42% 0 0);
-  --sessionzone-dark-2-active-button-text: oklch(82% 0 0);
+  /* Zone 2 is the desaturated area where the tab switcher lives */
+  --sketchzone-dark-2-background: oklch(37% 0 0);
+  --sketchzone-dark-2-text: oklch(77% 0 0);
+  --sketchzone-dark-2-active-button-background: oklch(42% 0 0);
+  --sketchzone-dark-2-active-button-text: oklch(82% 0 0);
 
   /* Color of the modal background and drop shadows */
-  --sessionzone-dark-shadow: oklch(72% 0 0);
-  --sessionzone-dark-overlay: oklch(72% 0 0 / 30%);
+  --sketchzone-dark-shadow: oklch(72% 0 0);
+  --sketchzone-dark-overlay: oklch(72% 0 0 / 30%);
 
   /**** Light mode ****/
-  --sessionzone-light-1-background: oklch(97% 0 0);
-  --sessionzone-light-1-text: oklch(57% 0 0);
-  --sessionzone-light-1-active-button-background: oklch(92% 0 0);
-  --sessionzone-light-1-active-button-text: oklch(52% 0 0);
-  --sessionzone-light-1-hint-text: oklch(77% 0 0);
+  --sketchzone-light-1-background: oklch(97% 0 0);
+  --sketchzone-light-1-text: oklch(57% 0 0);
+  --sketchzone-light-1-active-button-background: oklch(92% 0 0);
+  --sketchzone-light-1-active-button-text: oklch(52% 0 0);
+  --sketchzone-light-1-hint-text: oklch(77% 0 0); /* codemirror line numbers */
 
-  --sessionzone-light-2-background: oklch(87% 0 0);
-  --sessionzone-light-2-text: oklch(47% 0 0);
-  --sessionzone-light-2-active-button-background: oklch(82% 0 0);
-  --sessionzone-light-2-active-button-text: oklch(42% 0 0);
+  --sketchzone-light-2-background: oklch(87% 0 0);
+  --sketchzone-light-2-text: oklch(47% 0 0);
+  --sketchzone-light-2-active-button-background: oklch(82% 0 0);
+  --sketchzone-light-2-active-button-text: oklch(42% 0 0);
 
-  --sessionzone-light-shadow: oklch(52% 0 0);
-  --sessionzone-light-overlay: oklch(52% 0 0 / 30%);
+  --sketchzone-light-shadow: oklch(52% 0 0);
+  --sketchzone-light-overlay: oklch(52% 0 0 / 30%);
 
   /**** Calculated ****/
-  --sessionzone-box-shadow: 0 0 0.3rem 0 var(--sessionzone-shadow);
+  --sketchzone-box-shadow: 0 0 0.3rem 0 var(--sketchzone-shadow);
 }
 /* Light mode as a default */
 body {
-  --sessionzone-1-background: var(--sessionzone-light-1-background);
-  --sessionzone-1-text: var(--sessionzone-light-1-text);
-  --sessionzone-1-active-button-background: var(--sessionzone-light-1-active-button-background);
-  --sessionzone-1-active-button-text: var(--sessionzone-light-1-active-button-text);
-  --sessionzone-1-hint-text: var(--sessionzone-light-1-hint-text);
+  --sketchzone-1-background: var(--sketchzone-light-1-background);
+  --sketchzone-1-text: var(--sketchzone-light-1-text);
+  --sketchzone-1-active-button-background: var(--sketchzone-light-1-active-button-background);
+  --sketchzone-1-active-button-text: var(--sketchzone-light-1-active-button-text);
+  --sketchzone-1-hint-text: var(--sketchzone-light-1-hint-text);
 
-  --sessionzone-2-background: var(--sessionzone-light-2-background);
-  --sessionzone-2-text: var(--sessionzone-light-2-text);
-  --sessionzone-2-active-button-background: var(--sessionzone-light-2-active-button-background);
-  --sessionzone-2-active-button-text: var(--sessionzone-light-2-active-button-text);
+  --sketchzone-2-background: var(--sketchzone-light-2-background);
+  --sketchzone-2-text: var(--sketchzone-light-2-text);
+  --sketchzone-2-active-button-background: var(--sketchzone-light-2-active-button-background);
+  --sketchzone-2-active-button-text: var(--sketchzone-light-2-active-button-text);
 
-  --sessionzone-shadow: var(--sessionzone-light-shadow);
-  --sessionzone-overlay: var(--sessionzone-light-overlay);
+  --sketchzone-shadow: var(--sketchzone-light-shadow);
+  --sketchzone-overlay: var(--sketchzone-light-overlay);
 }
 
 /* Dark mode via media query */
 @media (prefers-color-scheme: dark) {
   body {
-    --sessionzone-1-background: var(--sessionzone-dark-1-background);
-    --sessionzone-1-text: var(--sessionzone-dark-1-text);
-    --sessionzone-1-active-button-background: var(--sessionzone-dark-1-active-button-background);
-    --sessionzone-1-active-button-text: var(--sessionzone-dark-1-active-button-text);
-    --sessionzone-1-hint-text: var(--sessionzone-dark-1-hint-text);
+    --sketchzone-1-background: var(--sketchzone-dark-1-background);
+    --sketchzone-1-text: var(--sketchzone-dark-1-text);
+    --sketchzone-1-active-button-background: var(--sketchzone-dark-1-active-button-background);
+    --sketchzone-1-active-button-text: var(--sketchzone-dark-1-active-button-text);
+    --sketchzone-1-hint-text: var(--sketchzone-dark-1-hint-text);
 
-    --sessionzone-2-background: var(--sessionzone-dark-2-background);
-    --sessionzone-2-text: var(--sessionzone-dark-2-text);
-    --sessionzone-2-active-button-background: var(--sessionzone-dark-2-active-button-background);
-    --sessionzone-2-active-button-text: var(--sessionzone-dark-2-active-button-text);
+    --sketchzone-2-background: var(--sketchzone-dark-2-background);
+    --sketchzone-2-text: var(--sketchzone-dark-2-text);
+    --sketchzone-2-active-button-background: var(--sketchzone-dark-2-active-button-background);
+    --sketchzone-2-active-button-text: var(--sketchzone-dark-2-active-button-text);
 
-    --sessionzone-shadow: var(--sessionzone-dark-shadow);
-    --sessionzone-overlay: var(--sessionzone-dark-overlay);
+    --sketchzone-shadow: var(--sketchzone-dark-shadow);
+    --sketchzone-overlay: var(--sketchzone-dark-overlay);
   }
 }
 
 /* Light mode via explicit selection */
 body.theme-light {
-  --sessionzone-1-background: var(--sessionzone-light-1-background);
-  --sessionzone-1-text: var(--sessionzone-light-1-text);
-  --sessionzone-1-active-button-background: var(--sessionzone-light-1-active-button-background);
-  --sessionzone-1-active-button-text: var(--sessionzone-light-1-active-button-text);
-  --sessionzone-1-hint-text: var(--sessionzone-light-1-hint-text);
+  --sketchzone-1-background: var(--sketchzone-light-1-background);
+  --sketchzone-1-text: var(--sketchzone-light-1-text);
+  --sketchzone-1-active-button-background: var(--sketchzone-light-1-active-button-background);
+  --sketchzone-1-active-button-text: var(--sketchzone-light-1-active-button-text);
+  --sketchzone-1-hint-text: var(--sketchzone-light-1-hint-text);
 
-  --sessionzone-2-background: var(--sessionzone-light-2-background);
-  --sessionzone-2-text: var(--sessionzone-light-2-text);
-  --sessionzone-2-active-button-background: var(--sessionzone-light-2-active-button-background);
-  --sessionzone-2-active-button-text: var(--sessionzone-light-2-active-button-text);
+  --sketchzone-2-background: var(--sketchzone-light-2-background);
+  --sketchzone-2-text: var(--sketchzone-light-2-text);
+  --sketchzone-2-active-button-background: var(--sketchzone-light-2-active-button-background);
+  --sketchzone-2-active-button-text: var(--sketchzone-light-2-active-button-text);
 
-  --sessionzone-shadow: var(--sessionzone-light-shadow);
-  --sessionzone-overlay: var(--sessionzone-light-overlay);
+  --sketchzone-shadow: var(--sketchzone-light-shadow);
+  --sketchzone-overlay: var(--sketchzone-light-overlay);
 }
 
 /* Dark mode via explicit selection */
 body.theme-dark {
-  --sessionzone-1-background: var(--sessionzone-dark-1-background);
-  --sessionzone-1-text: var(--sessionzone-dark-1-text);
-  --sessionzone-1-active-button-background: var(--sessionzone-dark-1-active-button-background);
-  --sessionzone-1-active-button-text: var(--sessionzone-dark-1-active-button-text);
-  --sessionzone-1-hint-text: var(--sessionzone-dark-1-hint-text);
+  --sketchzone-1-background: var(--sketchzone-dark-1-background);
+  --sketchzone-1-text: var(--sketchzone-dark-1-text);
+  --sketchzone-1-active-button-background: var(--sketchzone-dark-1-active-button-background);
+  --sketchzone-1-active-button-text: var(--sketchzone-dark-1-active-button-text);
+  --sketchzone-1-hint-text: var(--sketchzone-dark-1-hint-text);
 
-  --sessionzone-2-background: var(--sessionzone-dark-2-background);
-  --sessionzone-2-text: var(--sessionzone-dark-2-text);
-  --sessionzone-2-active-button-background: var(--sessionzone-dark-2-active-button-background);
-  --sessionzone-2-active-button-text: var(--sessionzone-dark-2-active-button-text);
+  --sketchzone-2-background: var(--sketchzone-dark-2-background);
+  --sketchzone-2-text: var(--sketchzone-dark-2-text);
+  --sketchzone-2-active-button-background: var(--sketchzone-dark-2-active-button-background);
+  --sketchzone-2-active-button-text: var(--sketchzone-dark-2-active-button-text);
 
-  --sessionzone-shadow: var(--sessionzone-dark-shadow);
-  --sessionzone-overlay: var(--sessionzone-dark-overlay);
+  --sketchzone-shadow: var(--sketchzone-dark-shadow);
+  --sketchzone-overlay: var(--sketchzone-dark-overlay);
 }
 
 /** LAYOUT **/
 
 /* Roots - body and main */
 body {
-  font-family: var(--sessionzone-ui);
-  background-color: var(--sessionzone-1-background);
-  color: var(--sessionzone-1-text);
+  font-family: var(--sketchzone-ui);
+  background-color: var(--sketchzone-1-background);
+  color: var(--sketchzone-1-text);
 
   /* This gets overwritten by JavaScript */
-  --sessionzone-text-editor-panel-width: 1fr;
+  --sketchzone-text-editor-panel-width: 1fr;
 }
 main {
   width: 100%;
   min-height: 100%;
   display: grid;
-  grid-template-columns: calc(var(--sessionzone-button-size) + 3 * var(--sessionzone-small-padding)) 1fr;
+  grid-template-columns: calc(var(--sketchzone-button-size) + 3 * var(--sketchzone-small-padding)) 1fr;
 }
 
 /* Buttons
@@ -165,30 +165,30 @@ main {
  * button group obvious enough. */
 button {
   border: 0;
-  border-radius: var(--sessionzone-radius);
-  height: var(--sessionzone-button-size);
-  padding-inline: var(--sessionzone-small-padding);
-  background-color: var(--sessionzone-2-background);
-  color: var(--sessionzone-2-text);
+  border-radius: var(--sketchzone-radius);
+  height: var(--sketchzone-button-size);
+  padding-inline: var(--sketchzone-small-padding);
+  background-color: var(--sketchzone-2-background);
+  color: var(--sketchzone-2-text);
   display: flex;
   align-items: center;
-  gap: var(--sessionzone-small-padding);
+  gap: var(--sketchzone-small-padding);
 }
 button:hover {
-  background-color: var(--sessionzone-2-active-button-background);
-  color: var(--sessionzone-2-active-button-text);
+  background-color: var(--sketchzone-2-active-button-background);
+  color: var(--sketchzone-2-active-button-text);
 }
 .zone1 button {
-  background-color: var(--sessionzone-1-background);
-  color: var(--sessionzone-1-text);
+  background-color: var(--sketchzone-1-background);
+  color: var(--sketchzone-1-text);
 }
 .zone1 button:hover {
-  background-color: var(--sessionzone-1-active-button-background);
-  color: var(--sessionzone-1-active-button-text);
+  background-color: var(--sketchzone-1-active-button-background);
+  color: var(--sketchzone-1-active-button-text);
 }
 
 /* Config area outside of the rounded rect in zone 1 */
-.sessionzone-config {
+.sketchzone-config {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -196,254 +196,260 @@ button:hover {
   align-items: stretch;
 }
 
-/* The rounded rect contains both the header and the active session */
-.sessionzone-container {
-  border-radius: calc(var(--sessionzone-radius) + var(--sessionzone-small-padding));
-  padding: var(--sessionzone-small-padding);
-  display: grid;
-  grid-template-rows: 1fr var(--sessionzone-session-height);
-  background-color: var(--sessionzone-2-background);
-  color: var(--sessionzone-2-text);
-  margin: var(--sessionzone-outer-padding) var(--sessionzone-outer-padding)
-    var(--sessionzone-outer-padding) 0;
-}
-
-/* Header */
-.sessionzone-header {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--sessionzone-small-padding);
-}
-.sessionzone-logo {
-  font-size: 1.5rem;
-  line-height: 1.5rem;
-  margin-block: auto;
-  padding-bottom: var(--sessionzone-tab-bottom-padding);
-  padding-right: var(--sessionzone-large-padding);
-}
-
-.sessionzone-tabs {
-  display: flex;
-  flex-direction: row;
-  overflow-x: scroll;
-  overscroll-behavior-x: none;
-  gap: var(--sessionzone-small-padding);
-}
-.sessionzone-tab {
-  display: flex;
-  flex-direction: row;
-  min-width: fit-content;
-  padding-bottom: var(--sessionzone-tab-bottom-padding);
-}
-.sessionzone-tab-add {
-  position: sticky;
-  right: 0;
-}
-.sessionzone-tab-left {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  padding-left: var(--sessionzone-large-padding);
-}
-.sessionzone-tab-solo {
-  padding-inline: var(--sessionzone-large-padding);
-}
-.sessionzone-tab-close {
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-}
-
-.sessionzone-tab.zone2 .sessionzone-tab-close {
-  color: transparent;
-}
-.sessionzone-tab.zone2:hover .sessionzone-tab-close {
-  color: var(--sessionzone-2-text);
-}
-.sessionzone-tab.zone2:hover .sessionzone-tab-close:hover {
-  color: var(--sessionzone-2-text);
-}
-
-/* Left-side configuration menu */
-.sessionzone-config-menu {
+.sketchzone-config-menu {
   display: flex;
   flex-direction: column;
-  padding: var(--sessionzone-small-padding);
-  gap: var(--sessionzone-small-padding);
+  padding: var(--sketchzone-small-padding);
+  gap: var(--sketchzone-small-padding);
 }
-.sessionzone-config-menu button {
-  width: calc(var(--sessionzone-button-size) + var(--sessionzone-small-padding));
-  height: calc(var(--sessionzone-button-size) + var(--sessionzone-small-padding));
+.sketchzone-config-menu button {
+  width: calc(var(--sketchzone-button-size) + var(--sketchzone-small-padding));
+  height: calc(var(--sketchzone-button-size) + var(--sketchzone-small-padding));
 }
-.sessionzone-config-menu svg {
+.sketchzone-config-menu svg {
   margin: auto;
 }
-.sessionzone-config-load-selections {
+.sketchzone-config-load-selections {
   overflow-y: scroll;
 }
-.sessionzone-config-load-selections button {
-  padding-block: var(--sessionzone-small-padding);
+.sketchzone-config-load-selections button {
+  padding-block: var(--sketchzone-small-padding);
   height: inherit;
   display: flex;
   flex-direction: column;
   gap: 0;
   width: 100%;
 }
-.sessionzone-config-load-selections button div {
+.sketchzone-config-load-selections button div {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow-x: hidden;
   width: 100%;
   text-align: left;
 }
-.sessionzone-config-load-selections button div.time {
+.sketchzone-config-load-selections button div.time {
   font-size: 0.8rem;
   font-style: italic;
 }
 @media (prefers-color-scheme: dark) {
-  #sessionzone-config-to-dark {
+  #sketchzone-config-to-dark {
     display: none;
   }
 }
 @media (prefers-color-scheme: light) {
-  #sessionzone-config-to-light {
+  #sketchzone-config-to-light {
     display: none;
   }
 }
-.theme-dark #sessionzone-config-to-light {
+.theme-dark #sketchzone-config-to-light {
   display: initial;
 }
-.theme-dark #sessionzone-config-to-dark {
+.theme-dark #sketchzone-config-to-dark {
   display: none;
 }
-.theme-light #sessionzone-config-to-light {
+.theme-light #sketchzone-config-to-light {
   display: none;
 }
-.theme-light #sessionzone-config-to-dark {
+.theme-light #sketchzone-config-to-dark {
   display: initial;
 }
 
-/* Active Session */
-#sessionzone-active-session {
+/* The rounded rect contains both tabs and the active sketch */
+.sketchzone-container {
+  border-radius: calc(var(--sketchzone-radius) + var(--sketchzone-small-padding));
+  padding: var(--sketchzone-small-padding);
+  display: grid;
+  grid-template-rows: 1fr var(--sketchzone-sketch-height);
+  background-color: var(--sketchzone-2-background);
+  color: var(--sketchzone-2-text);
+  margin: var(--sketchzone-outer-padding) var(--sketchzone-outer-padding)
+    var(--sketchzone-outer-padding) 0;
+}
+
+/* Header */
+.sketchzone-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--sketchzone-small-padding);
+}
+.sketchzone-logo {
+  font-size: 1.5rem;
+  line-height: 1.5rem;
+  margin-block: auto;
+  padding-bottom: var(--sketchzone-tab-bottom-padding);
+  padding-right: var(--sketchzone-large-padding);
+}
+
+.sketchzone-tabs {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--sketchzone-small-padding);
+}
+.sketchzone-current-tabs {
+  display: flex;
+  flex-direction: row;
+  gap: var(--sketchzone-small-padding);
+  overflow-x: scroll;
+}
+.sketchzone-tab {
+  display: flex;
+  flex-direction: row;
+  min-width: fit-content;
+  padding-bottom: var(--sketchzone-tab-bottom-padding);
+}
+.sketchzone-tab-add {
+  position: sticky;
+  right: 0;
+}
+.sketchzone-tab-left {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  padding-left: var(--sketchzone-large-padding);
+}
+.sketchzone-tab-solo {
+  padding-inline: var(--sketchzone-large-padding);
+}
+.sketchzone-tab-close {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.sketchzone-tab.zone2 .sketchzone-tab-close {
+  color: transparent;
+}
+.sketchzone-tab.zone2:hover .sketchzone-tab-close {
+  color: var(--sketchzone-2-text);
+}
+.sketchzone-tab.zone2:hover .sketchzone-tab-close:hover {
+  color: var(--sketchzone-2-text);
+}
+
+/* Currently Displayed Sketch */
+#sketchzone-active-sketch {
   display: grid; /* display: none;  JS sets as 'grid' to avoid resize flash */
-  grid-template-columns: var(--sessionzone-text-editor-panel-width) var(--sessionzone-fixed-padding) minmax(
+  grid-template-columns: var(--sketchzone-text-editor-panel-width) var(--sketchzone-fixed-padding) minmax(
       250px,
       1fr
     );
   grid-template-areas: 'editor divider viewer';
-  --sessionzone-text-editor-height: var(--sessionzone-session-height);
+  --sketchzone-text-editor-height: var(--sketchzone-sketch-height);
 }
 
-/* Active Session Part 1: Editor */
-#sessionzone-codemirror-root {
-  background-color: var(--sessionzone-1-background);
-  color: var(--sessionzone-1-text);
-  box-shadow: var(--sessionzone-box-shadow);
-  border-radius: var(--sessionzone-radius);
-  padding-left: var(--sessionzone-small-padding);
+/* Sketch Part 1: Editor */
+#sketchzone-codemirror-root {
+  background-color: var(--sketchzone-1-background);
+  color: var(--sketchzone-1-text);
+  box-shadow: var(--sketchzone-box-shadow);
+  border-radius: var(--sketchzone-radius);
+  padding-left: var(--sketchzone-small-padding);
   display: grid;
   grid-area: editor;
 }
-#sessionzone-codemirror-root .cm-editor {
-  height: var(--sessionzone-text-editor-height);
+#sketchzone-codemirror-root .cm-editor {
+  height: var(--sketchzone-text-editor-height);
 }
 
-/* Active Session Part 2: Divider */
-#sessionzone-divider {
+/* Sketch Part 2: Divider */
+#sketchzone-divider {
   cursor: ew-resize;
   grid-area: divider;
 }
 
-/* Active Session Part 3: Inspector */
-#sessionzone-inspector-controller {
-  background-color: var(--sessionzone-1-background);
-  height: var(--sessionzone-button-size);
-  box-shadow: var(--sessionzone-box-shadow);
-  border-radius: var(--sessionzone-radius);
+/* Sketch Part 3: Inspector */
+#sketchzone-inspector-controller {
+  background-color: var(--sketchzone-1-background);
+  height: var(--sketchzone-button-size);
+  box-shadow: var(--sketchzone-box-shadow);
+  border-radius: var(--sketchzone-radius);
   display: flex;
   flex-direction: row;
   overflow-x: hidden;
 }
+#sketchzone-inspector-contents {
+  height: calc(var(--sketchzone-sketch-height) - var(--sketchzone-button-size));
+  display: grid;
+}
 
-/* Active session: Mobile view */
-#sessionzone-inspector-view,
-#sessionzone-inspector-inspect {
+/* Sketch in Mobile view */
+#sketchzone-inspector-view,
+#sketchzone-inspector-inspect {
   display: none;
 }
 @media (max-width: 650px) {
-  #sessionzone-inspector-view,
-  #sessionzone-inspector-inspect {
+  #sketchzone-inspector-view,
+  #sketchzone-inspector-inspect {
     display: inherit;
   }
 
-  #sessionzone-divider {
+  #sketchzone-divider {
     display: none;
   }
 
-  div#sessionzone-active-session {
+  div#sketchzone-active-sketch {
     grid-template-columns: 1fr;
   }
-  div#sessionzone-active-session.active-session-is-showing-editor {
+  div#sketchzone-active-sketch.active-sketch-is-showing-editor {
     grid-template-areas: 'viewer' 'editor';
-    gap: var(--sessionzone-small-padding);
-    --sessionzone-text-editor-height: calc(
-      var(--sessionzone-session-height) - var(--sessionzone-button-size) -
-        var(--sessionzone-small-padding)
+    gap: var(--sketchzone-small-padding);
+    --sketchzone-text-editor-height: calc(
+      var(--sketchzone-sketch-height) - var(--sketchzone-button-size) -
+        var(--sketchzone-small-padding)
     );
   }
-  div#sessionzone-active-session.active-session-is-showing-inspector {
+  div#sketchzone-active-sketch.active-sketch-is-showing-inspector {
     grid-template-areas: 'viewer';
   }
 
-  div#sessionzone-active-session.active-session-is-showing-editor #sessionzone-inspector-contents {
+  div#sketchzone-active-sketch.active-sketch-is-showing-editor #sketchzone-inspector-contents {
     display: none;
   }
-  div#sessionzone-active-session.active-session-is-showing-inspector #sessionzone-codemirror-root {
+  div#sketchzone-active-sketch.active-sketch-is-showing-inspector #sketchzone-codemirror-root {
     display: none;
   }
 
-  div#sessionzone-active-session.active-session-is-showing-inspector #sessionzone-inspector-load {
+  div#sketchzone-active-sketch.active-sketch-is-showing-inspector #sketchzone-inspector-load {
     display: none;
   }
-  div#sessionzone-active-session.active-session-is-showing-editor #sessionzone-inspector-view {
+  div#sketchzone-active-sketch.active-sketch-is-showing-editor #sketchzone-inspector-view {
     display: none;
   }
-  div#sessionzone-active-session.active-session-is-showing-inspector
-    #sessionzone-inspector-inspect {
+  div#sketchzone-active-sketch.active-sketch-is-showing-inspector #sketchzone-inspector-inspect {
     display: none;
   }
 }
 
 /* Radix UI Dialog Modals */
-.sessionzone-dialog-overlay {
-  background-color: var(--sessionzone-overlay);
+.sketchzone-dialog-overlay {
+  background-color: var(--sketchzone-overlay);
   position: fixed;
   inset: 0;
   overflow-y: scroll;
 }
-.sessionzone-dialog-content {
-  background-color: var(--sessionzone-1-background);
+.sketchzone-dialog-content {
+  background-color: var(--sketchzone-1-background);
   border-radius: 6px;
-  box-shadow: var(--sessionzone-box-shadow);
+  box-shadow: var(--sketchzone-box-shadow);
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: calc(100vw - 2 * var(--sessionzone-outer-padding) - 2 * var(--sessionzone-large-padding));
+  width: calc(100vw - 2 * var(--sketchzone-outer-padding) - 2 * var(--sketchzone-large-padding));
   max-width: 450px;
   max-height: calc(
-    100vh - 2 * var(--sessionzone-outer-padding) - 2 * var(--sessionzone-large-padding)
+    100vh - 2 * var(--sketchzone-outer-padding) - 2 * var(--sketchzone-large-padding)
   );
-  padding: var(--sessionzone-fixed-padding);
+  padding: var(--sketchzone-fixed-padding);
   display: flex;
   flex-direction: column;
 }
-.sessionzone-dialog-content:focus {
+.sketchzone-dialog-content:focus {
   outline: none;
 }
-.sessionzone-dialog-content p {
-  padding-bottom: var(--sessionzone-fixed-padding);
+.sketchzone-dialog-content p {
+  padding-bottom: var(--sketchzone-fixed-padding);
 }
 
-.sessionzone-dialog-content.sessionzone-config-load {
+.sketchzone-dialog-content.sketchzone-config-load {
   max-width: 800px;
 }
 
@@ -452,10 +458,10 @@ button:hover {
   outline: none;
 }
 .cm-editor .cm-scroller .cm-content {
-  caret-color: var(--sessionzone-1-text);
+  caret-color: var(--sketchzone-1-text);
 }
 .cm-editor .cm-content {
-  font-family: var(--sessionzone-mono);
+  font-family: var(--sketchzone-mono);
 }
 .cm-gutter.cm-lineNumbers {
   width: 100%;
@@ -464,6 +470,16 @@ button:hover {
   background: transparent;
   width: 2rem;
   border: none;
-  font-family: var(--sessionzone-ui);
-  color: var(--sessionzone-1-hint-text);
+  font-family: var(--sketchzone-ui);
+  color: var(--sketchzone-1-hint-text);
+}
+
+/* Some default inspector styling */
+.sketchzone-rounded-inspector {
+  margin-top: var(--sketchzone-small-padding);
+  border-radius: var(--sketchzone-radius);
+  box-shadow: var(--sketchzone-box-shadow);
+  background-color: var(--sketchzone-1-background);
+  color: var(--sketchzone-1-text);
+  padding: var(--sketchzone-large-padding);
 }

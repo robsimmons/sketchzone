@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import React from 'react';
-import type { SessionObject } from '../storage.js';
+import { SKETCHES_DB, SketchObject } from '../storage.js';
 import { ArchiveIcon, MoonIcon, Share1Icon, SunIcon } from '@radix-ui/react-icons';
 interface Props {
   db: IDBDatabase;
@@ -14,8 +14,8 @@ const BUTTON_ICON_SIZE = '24px';
 
 export default function ConfigMenu({ db, restore, share }: Props) {
   const [open, setOpen] = React.useState(false);
-  const [sessions, setSessions] = React.useState<
-    null | { key: IDBValidKey; value: SessionObject }[]
+  const [sketches, setSketches] = React.useState<
+    null | { key: IDBValidKey; value: SketchObject }[]
   >(null);
   const alerted = React.useRef(false);
 
@@ -30,25 +30,24 @@ export default function ConfigMenu({ db, restore, share }: Props) {
 
   React.useEffect(() => {
     if (!open) {
-      setSessions(null);
+      setSketches(null);
       return;
     }
-    const sessionStore = db.transaction(['sessions'], 'readonly').objectStore('sessions');
-    const updatedIndex = sessionStore.index('updated');
-    const cursor = updatedIndex.openCursor(undefined, 'prev');
-    const sessionsAccum: { key: IDBValidKey; value: SessionObject }[] = [];
+    const sketchStore = db.transaction([SKETCHES_DB], 'readonly').objectStore(SKETCHES_DB);
+    const cursor = sketchStore.index('updated').openCursor(undefined, 'prev');
+    const sketchesAccum: { key: IDBValidKey; value: SketchObject }[] = [];
     cursor.onsuccess = () => {
       if (cursor.result === null) {
-        setSessions(sessionsAccum);
+        setSketches(sketchesAccum);
       } else {
-        sessionsAccum.push({ key: cursor.result.primaryKey, value: cursor.result.value });
+        sketchesAccum.push({ key: cursor.result.primaryKey, value: cursor.result.value });
         cursor.result.continue();
       }
     };
   }, [db, open]);
 
   return (
-    <div className="zone1 sessionzone-config-menu">
+    <div className="zone1 sketchzone-config-menu">
       <button>
         <MoonIcon width={BUTTON_ICON_SIZE} height={BUTTON_ICON_SIZE} />
       </button>
@@ -67,17 +66,17 @@ export default function ConfigMenu({ db, restore, share }: Props) {
           <ArchiveIcon width={BUTTON_ICON_SIZE} height={BUTTON_ICON_SIZE} />
         </Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Overlay className="sessionzone-dialog-overlay"></Dialog.Overlay>
-          <Dialog.Content className="sessionzone-dialog-content sessionzone-config-load">
+          <Dialog.Overlay className="sketchzone-dialog-overlay"></Dialog.Overlay>
+          <Dialog.Content className="sketchzone-dialog-content sketchzone-config-load">
             <Dialog.Title>History</Dialog.Title>
             <VisuallyHidden>
               <Dialog.Description>Pick a previously-opened program to re-open</Dialog.Description>
             </VisuallyHidden>
-            {sessions === null ? (
+            {sketches === null ? (
               'loading...'
             ) : (
-              <div className="sessionzone-config-load-selections zone1">
-                {sessions.map(({ key, value }) => (
+              <div className="sketchzone-config-load-selections zone1">
+                {sketches.map(({ key, value }) => (
                   <button
                     key={`${key}`}
                     onClick={async (event) => {
@@ -130,7 +129,7 @@ export default function ConfigMenu({ db, restore, share }: Props) {
       </button>
       <button
         title="Switch to dark mode"
-        id="sessionzone-config-to-dark"
+        id="sketchzone-config-to-dark"
         onClick={(event) => {
           event.preventDefault();
           document.getElementById('body-root')!.className = 'theme-dark';
@@ -141,7 +140,7 @@ export default function ConfigMenu({ db, restore, share }: Props) {
       </button>
       <button
         title="Switch to light mode"
-        id="sessionzone-config-to-light"
+        id="sketchzone-config-to-light"
         onClick={(event) => {
           event.preventDefault();
           document.getElementById('body-root')!.className = 'theme-light';

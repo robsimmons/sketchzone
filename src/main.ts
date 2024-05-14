@@ -1,25 +1,28 @@
 import { UrlHashAction, decodeUrlHashAction, encodeUrlHashAction } from './hash-action.js';
 import ReactDOM from 'react-dom/client';
+import type { Extension } from '@codemirror/state';
+import { EditorView } from '@codemirror/view';
+
+import ActiveSketch from './active-sketch.js';
+import holdForModal from './components/HoldingModal.js';
+import InspectorController from './components/InspectorController.js';
+import setupDivider from './components/Divider.js';
+import SketchTabs from './components/SketchTabs.js';
 import {
-  SessionObject,
+  DOCUMENT,
+  SKETCHES_DB,
+  SketchObject,
+  TABS_DB,
   TabsObject,
-  addSession,
-  getSession,
+  addSketch,
+  getSketch,
   initializeStorage,
-  storeSession,
+  storeSketch,
   storeTabs,
 } from './storage.js';
-import { Extension } from '@codemirror/state';
-import { EditorView } from '@codemirror/view';
-import InspectorController from './components/InspectorController.js';
-import setupSessionDivider from './components/SessionDivider.js';
-import SessionTabs from './components/SessionTabs.js';
-import holdForModal from './components/HoldingModal.js';
-import ActiveSession from './active-session.js';
+import type { Inspector } from './inspector.js';
 
 const ICON_SIZE = '24px';
-
-type DOCUMENT = string | { t: 'empty' };
 
 /**
  * Interact with all the decoding nonsense in hash-action.ts, return a hash
@@ -46,47 +49,50 @@ async function readActionFromURLHash(): Promise<UrlHashAction<DOCUMENT> | null> 
 
 /**
  * This is the hairiest ball of wax in the application, because it's where we need to
- * maintain session data and keep the database in sync with itself.
+ * maintain data for all active sketches, keep the current sketch displayed and in sync
+ * with their inspectors, and keep the database in sync with itself.
  *
  * @param emptyDocument
  * @param extractTitleFromDoc
  */
-async function setupEditorInteractions<SessionData>(
+async function setupEditorInteractions(
   emptyDocument: () => DOCUMENT,
   extractTitleFromDoc: (doc: DOCUMENT) => string,
+  createAndMountInspector: (doc: DOCUMENT) => Inspector,
   codemirrorExtensions: Extension[],
   title: string,
   db: IDBDatabase,
   initialTabs: TabsObject,
-  initialSession: SessionObject,
+  initialSketch: SketchObject,
 ) {
   /** STATE VARIABLES **/
   /* The tabs kept in-memory are either exactly the tab data pulled from the database
-   * (tab.active === false) or ActiveSession objects (tab.active === true). Tabs are
-   * lazily turned from data-only sessions to ActiveSessions as tabs are opened for the
+   * (tab.active === false) or ActiveSketch objects (tab.active === true). Tabs are
+   * lazily turned from data-only sketches to ActiveSketches as tabs are opened for the
    * first time. This isn't done for efficiency, but because it actually helped me
    * understand what was going on.
    *
-   * INVARIANT: tabs.sessions[tabs.activeSession] === displayedSession
-   * If you mess with tabs.sessions, you need to immediately call
-   * restoreSessionFromTabs() to persist the tabs to memory and reset the activeSession
-   * correctly.
+   * INVARIANT: tabs.sketches[tabs.displayedSketchIndex] === displayedSketch
+   * If you mess with tabs.sketches, you need to immediately call
+   * restoreFromTabs() which will persist the tabs to memory and reset the
+   * displayedSketchIndex correctly.
    */
   const tabs: {
     current: {
-      activeSessionIndex: number;
-      sessions: (ActiveSession<SessionData> | { title: string; key: IDBValidKey; active: false })[];
+      displayedSketchIndex: number;
+      sketches: (ActiveSketch | { title: string; key: IDBValidKey; active: false })[];
     };
   } = {
     current: {
-      activeSessionIndex: initialTabs.activeSessionIndex,
-      sessions: initialTabs.sessions.map((session) => ({ ...session, active: false })),
+      displayedSketchIndex: initialTabs.displayedSketchIndex,
+      sketches: initialTabs.sketches.map((sketch) => ({ ...sketch, active: false })),
     },
   };
-  const displayedSession: { current: ActiveSession<SessionData> } = {
-    current: new ActiveSession(
-      tabs.current.sessions[tabs.current.activeSessionIndex].key,
-      initialSession,
+  const displayedSketch: { current: ActiveSketch } = {
+    current: new ActiveSketch(
+      tabs.current.sketches[tabs.current.displayedSketchIndex].key,
+      initialSketch,
+      createAndMountInspector,
       codemirrorExtensions,
       triggerRedraw,
       triggerStorage,
@@ -96,157 +102,180 @@ async function setupEditorInteractions<SessionData>(
 
   function extractTabsForStorage(): TabsObject {
     return {
-      activeSessionIndex: tabs.current.activeSessionIndex,
-      sessions: tabs.current.sessions.map(({ key, title }) => ({ key, title })),
+      displayedSketchIndex: tabs.current.displayedSketchIndex,
+      sketches: tabs.current.sketches.map(({ key, title }) => ({ key, title })),
     };
   }
 
-  /** CALLBACKS ONLY PASSED TO/INVOKED BY ACTIVE SESSION **/
+  /** CALLBACKS: ONLY PASSED TO THE ActiveSketch CONSTRUCTOR **/
   async function triggerStorage(
     key: IDBValidKey,
     createdAt: Date,
     updatedAt: Date,
     document: DOCUMENT,
   ) {
-    const tx = db.transaction(['sessions', 'tabs'], 'readwrite');
-    const tabsStore = tx.objectStore('tabs');
-    const sessionStore = tx.objectStore('sessions');
+    const tx = db.transaction([SKETCHES_DB, TABS_DB], 'readwrite');
+    const tabsStore = tx.objectStore(TABS_DB);
+    const sketchStore = tx.objectStore(SKETCHES_DB);
     await storeTabs(tabsStore, extractTabsForStorage());
-    await storeSession(sessionStore, key, { createdAt, updatedAt, document });
+    await storeSketch(sketchStore, key, { createdAt, updatedAt, document });
   }
 
   /** CODEMIRROR **/
   const view = new EditorView({
-    state: displayedSession.current.codemirrorState,
-    parent: document.getElementById('sessionzone-codemirror-root')!,
+    state: displayedSketch.current.codemirrorState,
+    parent: document.getElementById('sketchzone-codemirror-root')!,
   });
 
   /** INSPECTOR CONTROLLER **/
   const inspectorControllerRoot = ReactDOM.createRoot(
-    document.getElementById('sessionzone-inspector-controller')!,
+    document.getElementById('sketchzone-inspector-controller')!,
   );
   function renderInspectorController() {
     const state =
-      displayedSession.current.sessionData === null
+      displayedSketch.current.inspectorState === null
         ? 'unloaded'
-        : displayedSession.current.sessionData.isClientOutOfDate
+        : displayedSketch.current.inspectorState.isInspectorOutOfDate
         ? 'modified'
         : 'loaded';
-    inspectorControllerRoot.render(InspectorController({ state, iconSize: ICON_SIZE }));
+    inspectorControllerRoot.render(
+      InspectorController({
+        state,
+        iconSize: ICON_SIZE,
+        onLoad: () =>
+          displayedSketch.current.load(displayedSketch.current.codemirrorState.doc.toString()),
+      }),
+    );
   }
 
-  /** SESSION TABS CONTROLLER **/
-  const sessionTabsRoot = ReactDOM.createRoot(document.getElementById('sessionzone-tabs')!);
-  function renderSessionTabs() {
-    sessionTabsRoot.render(
-      SessionTabs({
+  /** TABS CONTROLLER **/
+  const tabsRoot = ReactDOM.createRoot(document.getElementById('sketchzone-tabs')!);
+  function renderSketchTabs() {
+    tabsRoot.render(
+      SketchTabs({
         tabs: tabs.current,
         iconSize: ICON_SIZE,
         switchToIndex,
         deleteIndex,
-        create: createSession,
+        create: createSketch,
       }),
     );
   }
 
   function switchToIndex(index: number) {
     tabs.current = {
-      activeSessionIndex: index,
-      sessions: tabs.current.sessions,
+      displayedSketchIndex: index,
+      sketches: tabs.current.sketches,
     };
-    restoreSessionFromTabs();
+    restoreFromTabs();
   }
 
   async function deleteIndex(index: number) {
-    if (tabs.current.sessions.length === 1) return;
-    const removedSession = tabs.current.sessions[index];
-    let activeSessionIndex = tabs.current.activeSessionIndex;
-    const sessions = tabs.current.sessions.toSpliced(index, 1);
-    if (index === tabs.current.activeSessionIndex) {
-      // Terminating current active session
-      displayedSession.current.terminate();
-      if (index === sessions.length) activeSessionIndex -= 1;
+    if (tabs.current.sketches.length === 1) return;
+
+    let displayedSketchIndex;
+    if (index === tabs.current.displayedSketchIndex) {
+      // Deleting current displayed sketch
+      // Expected behavior is that we switch to the next tab to the right,
+      // which amounts to keeping the index the same. Move the index left
+      // only if we deleted the last thing (and the current displayedSketchIndex
+      // would no longer be a valid index into the array)
+      displayedSketchIndex =
+        index === tabs.current.sketches.length - 1
+          ? tabs.current.displayedSketchIndex - 1
+          : tabs.current.displayedSketchIndex;
     } else {
-      // Terminating a different session
-      if (removedSession.active) removedSession.terminate();
-      if (index < tabs.current.activeSessionIndex) activeSessionIndex -= 1;
+      // Deleting a sketch that's not currently displayed
+      // Move the index left if that's needed to keep the currently
+      // displayed sketch displayed
+      displayedSketchIndex =
+        index > tabs.current.displayedSketchIndex
+          ? tabs.current.displayedSketchIndex
+          : tabs.current.displayedSketchIndex - 1;
     }
 
-    tabs.current = { activeSessionIndex, sessions };
-    await restoreSessionFromTabs();
+    tabs.current = { displayedSketchIndex, sketches: tabs.current.sketches.toSpliced(index, 1) };
+    await restoreFromTabs();
   }
 
-  async function createSession() {
+  async function createSketch() {
     const now = new Date();
-    const sessionStore = db.transaction(['sessions'], 'readwrite').objectStore('sessions');
+    const sketchStore = db.transaction([SKETCHES_DB], 'readwrite').objectStore(SKETCHES_DB);
     const emptyDoc = emptyDocument();
-    const key = await addSession(sessionStore, {
+    const key = await addSketch(sketchStore, {
       document: emptyDoc,
       createdAt: now,
       updatedAt: now,
     });
     tabs.current = {
-      activeSessionIndex: tabs.current.sessions.length,
-      sessions: tabs.current.sessions.concat([
+      displayedSketchIndex: tabs.current.sketches.length,
+      sketches: tabs.current.sketches.concat([
         { active: false, key, title: extractTitleFromDoc(emptyDoc) },
       ]),
     };
 
-    restoreSessionFromTabs();
+    restoreFromTabs();
   }
 
-  /** RESTORING SESSION STATUS **/
-  async function restoreSessionFromTabs() {
-    const tx = db.transaction(['tabs', 'sessions'], 'readwrite');
-    const tabsStore = tx.objectStore('tabs');
-    const sessionStore = tx.objectStore('sessions');
+  /** RESTORING SKETCH STATUS **/
+  async function restoreFromTabs() {
+    const tx = db.transaction([TABS_DB, SKETCHES_DB], 'readwrite');
+    const tabsStore = tx.objectStore(TABS_DB);
+    const sketchStore = tx.objectStore(SKETCHES_DB);
     await storeTabs(tabsStore, extractTabsForStorage());
 
-    if (displayedSession.current !== tabs.current.sessions[tabs.current.activeSessionIndex]) {
-      const rememberedSession = await getSession(
-        sessionStore,
-        tabs.current.sessions[tabs.current.activeSessionIndex].key,
+    if (displayedSketch.current !== tabs.current.sketches[tabs.current.displayedSketchIndex]) {
+      await displayedSketch.current.blur();
+      if (!tabs.current.sketches.some((sketch) => sketch.key === displayedSketch.current.key)) {
+        await displayedSketch.current.terminate();
+      }
+
+      const rememberedSketch = await getSketch(
+        sketchStore,
+        tabs.current.sketches[tabs.current.displayedSketchIndex].key,
       );
 
-      const newlyActivePseudoSession = tabs.current.sessions[tabs.current.activeSessionIndex];
-      if (newlyActivePseudoSession.active === true) {
-        displayedSession.current = newlyActivePseudoSession;
-        view.setState(displayedSession.current.codemirrorState);
+      const sketchToRestore = tabs.current.sketches[tabs.current.displayedSketchIndex];
+      if (sketchToRestore.active === true) {
+        displayedSketch.current = sketchToRestore;
+        view.setState(displayedSketch.current.codemirrorState);
+        await sketchToRestore.focus();
 
-        // Checks for situations where another browser window has been used to update this session
-        // Technically we should use time comparison for this, but because the user can only have
-        // one focused window at a time, the possibility of conflicting changes with the same
-        // timestamp seems infinitesimal
+        // Checks for situations where another browser window has been used to update this sketch
+        // It's kind of a code smell to use time comparison as a unique identifier in this way, but
+        // because the user can only have one focused window at a time, the possibility of
+        // conflicting changes with the same timestamp seems infinitesimal
         if (
-          rememberedSession.updatedAt.getTime() !==
-          displayedSession.current.documentUpdatedAt.getTime()
+          rememberedSketch.updatedAt.getTime() !==
+          displayedSketch.current.documentUpdatedAt.getTime()
         ) {
-          displayedSession.current.title = extractTitleFromDoc(rememberedSession.document);
+          displayedSketch.current.title = extractTitleFromDoc(rememberedSketch.document);
           view.dispatch({
             changes: {
               from: 0,
-              to: displayedSession.current.codemirrorState.doc.length,
+              to: displayedSketch.current.codemirrorState.doc.length,
               insert:
-                typeof rememberedSession.document === 'string'
-                  ? rememberedSession.document
+                typeof rememberedSketch.document === 'string'
+                  ? rememberedSketch.document
                   : '<object placeholder>',
             },
           });
-          if (displayedSession.current.sessionData !== null) {
-            displayedSession.current.sessionData.isClientOutOfDate = true;
+          if (displayedSketch.current.inspectorState !== null) {
+            displayedSketch.current.inspectorState.isInspectorOutOfDate = true;
           }
         }
       } else {
-        displayedSession.current = new ActiveSession(
-          newlyActivePseudoSession.key,
-          rememberedSession,
+        displayedSketch.current = new ActiveSketch(
+          sketchToRestore.key,
+          rememberedSketch,
+          createAndMountInspector,
           codemirrorExtensions,
           triggerRedraw,
           triggerStorage,
           extractTitleFromDoc,
         );
-        tabs.current.sessions[tabs.current.activeSessionIndex] = displayedSession.current;
-        view.setState(displayedSession.current.codemirrorState);
+        tabs.current.sketches[tabs.current.displayedSketchIndex] = displayedSketch.current;
+        view.setState(displayedSketch.current.codemirrorState);
       }
     }
     triggerRedraw();
@@ -256,35 +285,36 @@ async function setupEditorInteractions<SessionData>(
     if (window.location.hash !== '') {
       window.location.hash = '';
     }
-    document.title = `${title} | ${tabs.current.sessions[tabs.current.activeSessionIndex].title}`;
+    document.title = `${title} | ${tabs.current.sketches[tabs.current.displayedSketchIndex].title}`;
     renderInspectorController();
-    renderSessionTabs();
+    renderSketchTabs();
   }
 
   /** GO! **/
-  restoreSessionFromTabs();
+  restoreFromTabs();
 
   return {
-    restore: async (sessionKey: IDBValidKey) => {
+    restore: async (sketchKey: IDBValidKey) => {
       let found = false;
-      for (const [index, { key }] of tabs.current.sessions.entries()) {
-        if (key === sessionKey) {
-          tabs.current.activeSessionIndex = index;
+      for (const [index, { key }] of tabs.current.sketches.entries()) {
+        if (key === sketchKey) {
+          tabs.current.displayedSketchIndex = index;
           found = true;
           break;
         }
       }
 
       if (!found) {
-        const sessionStore = db.transaction(['sessions'], 'readonly').objectStore('sessions');
-        const rememberedSession = await getSession(sessionStore, sessionKey);
-        console.log(rememberedSession);
+        const sketchStore = db.transaction([SKETCHES_DB], 'readonly').objectStore(SKETCHES_DB);
+        const rememberedSketch = await getSketch(sketchStore, sketchKey);
+        console.log(rememberedSketch);
         tabs.current = {
-          activeSessionIndex: tabs.current.sessions.length,
-          sessions: tabs.current.sessions.concat([
-            new ActiveSession(
-              sessionKey,
-              rememberedSession,
+          displayedSketchIndex: tabs.current.sketches.length,
+          sketches: tabs.current.sketches.concat([
+            new ActiveSketch(
+              sketchKey,
+              rememberedSketch,
+              createAndMountInspector,
               codemirrorExtensions,
               triggerRedraw,
               triggerStorage,
@@ -294,12 +324,12 @@ async function setupEditorInteractions<SessionData>(
         };
       }
 
-      await restoreSessionFromTabs();
+      await restoreFromTabs();
     },
     share: async () => {
       window.location.hash = await encodeUrlHashAction<DOCUMENT>({
         t: 'open',
-        document: displayedSession.current.codemirrorState.doc.toString(),
+        document: displayedSketch.current.codemirrorState.doc.toString(),
       });
       return window.location.toString();
     },
@@ -307,35 +337,37 @@ async function setupEditorInteractions<SessionData>(
   };
 }
 
-export async function setup<SessionData>(options: {
+export async function setup(options: {
   emptyDocument: () => DOCUMENT;
   extractTitleFromDoc: (doc: DOCUMENT) => string;
+  createAndMountInspector: (doc: DOCUMENT) => Inspector;
   codemirrorExtensions: Extension[];
   defaultEntries?: DOCUMENT[];
   title?: string;
 }) {
-  // Initialize and read path
+  // Set up storage
   const title = options.title ?? document.title;
-  document.getElementById('sessionzone-logo')!.innerText = title;
+  document.getElementById('sketchzone-logo')!.innerText = title;
   const hashAction: UrlHashAction<DOCUMENT> | null = await readActionFromURLHash();
-  const { db, tabs, session } = await initializeStorage(
+  const { db, tabs, sketch } = await initializeStorage(
     hashAction,
     options.defaultEntries ?? [options.emptyDocument()],
     options.extractTitleFromDoc,
     (messages) => holdForModal('Error loading workspace', messages[0], messages.slice(1)),
   );
 
-  // Web setup that can be done independently from the hairy ball of wax
-  setupSessionDivider();
+  // Do web setup that can be made independent of the hairy ball of wax
+  setupDivider();
 
-  // Set up the hairy ball of session-management wax
-  return await setupEditorInteractions<SessionData>(
+  // Set up the hairy ball of multiple-sketch-management wax
+  return await setupEditorInteractions(
     options.emptyDocument,
     options.extractTitleFromDoc,
+    options.createAndMountInspector,
     options.codemirrorExtensions,
     title,
     db,
     tabs,
-    session,
+    sketch,
   );
 }

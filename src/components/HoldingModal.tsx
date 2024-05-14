@@ -31,8 +31,8 @@ export default function holdForModal(
             }}
           >
             <Dialog.Portal>
-              <Dialog.Overlay className="sessionzone-dialog-overlay" />
-              <Dialog.Content className="sessionzone-dialog-content">
+              <Dialog.Overlay className="sketchzone-dialog-overlay" />
+              <Dialog.Content className="sketchzone-dialog-content">
                 <VisuallyHidden asChild>
                   <Dialog.Title>{title}</Dialog.Title>
                 </VisuallyHidden>

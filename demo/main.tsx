@@ -4,6 +4,8 @@ import ReactDOM from 'react-dom/client';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { Extension } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers } from '@codemirror/view';
+import { Inspector } from '../src/inspector.ts';
+import { DOCUMENT } from '../src/storage.ts';
 
 const lorem = (input: number | string) =>
   `
@@ -32,6 +34,33 @@ export const codemirrorExtensions: Extension[] = [
   keymap.of([...defaultKeymap, ...historyKeymap]),
 ];
 
+function getHTML(doc: DOCUMENT, loads: number) {
+  return `<div class="sketchzone-rounded-inspector">
+    <div>There is/are ${`${doc}`.split('\n').length} line(s)</div>
+    <div>You've loaded this document ${loads} times</div>
+  </div>`;
+}
+function newInspector(doc: DOCUMENT): Inspector {
+  const root = document.getElementById('sketchzone-inspector-contents')!;
+  let loads = 1;
+  root.innerHTML = getHTML(doc, loads);
+
+  return {
+    reload: async (newDoc) => {
+      loads += 1;
+      doc = newDoc;
+      root.innerHTML = getHTML(doc, loads);
+    },
+    unmount: async () => {
+      root.innerHTML = '';
+    },
+    remount: async () => {
+      root.innerHTML = getHTML(doc, loads);
+    },
+    destroy: async () => {},
+  };
+}
+
 const { db, restore, share } = await setup({
   extractTitleFromDoc: (document) => {
     if (typeof document !== 'string') return '<empty placeholder>';
@@ -40,10 +69,11 @@ const { db, restore, share } = await setup({
     return firstLine;
   },
   emptyDocument: () => '',
+  createAndMountInspector: newInspector,
   codemirrorExtensions,
   defaultEntries: [lorem(1), lorem(2), lorem(3)],
   title: 'MyEd',
 });
 
-const configRoot = ReactDOM.createRoot(document.getElementById('sessionzone-config-root')!);
+const configRoot = ReactDOM.createRoot(document.getElementById('sketchzone-config-root')!);
 configRoot.render(<ConfigMenu db={db} restore={restore} share={share} />);

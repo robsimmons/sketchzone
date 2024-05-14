@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Editor</title>
+    <title>Generic Editor</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,20 +13,20 @@
     <link href="/src/css/reset.css" rel="stylesheet" />
     <link href="/src/css/editzone.css" rel="stylesheet" />
   </head>
-  <body id="body-root" >
+  <body id="body-root">
     <main id="main-root" class="config-menu-is-closed">
-      <div class="sessionzone-config" id="sessionzone-config-root"></div>
-      <div id="sessions" class="sessionzone-container">
-        <div class="sessionzone-header">
-          <div id="sessionzone-tabs" class="sessionzone-tabs"></div>
-          <div id="sessionzone-logo" class="sessionzone-logo"></div>
+      <div class="sketchzone-config" id="sketchzone-config-root"></div>
+      <div id="sketches" class="sketchzone-container">
+        <div class="sketchzone-header">
+          <div id="sketchzone-tabs" class="sketchzone-tabs"></div>
+          <div id="sketchzone-logo" class="sketchzone-logo"></div>
         </div>
-        <div id="sessionzone-active-session" class="active-session-is-showing-editor">
-          <div id="sessionzone-codemirror-root"></div>
-          <div id="sessionzone-divider"></div>
-          <div id="sessionzone-inspector-root">
-            <div id="sessionzone-inspector-controller" class="zone1"></div>
-            <div id="sessionzone-inspector-contents">Hi Hi Hi</div>
+        <div id="sketchzone-active-sketch" class="active-sketch-is-showing-editor">
+          <div id="sketchzone-codemirror-root"></div>
+          <div id="sketchzone-divider"></div>
+          <div id="sketchzone-inspector-root">
+            <div id="sketchzone-inspector-controller" class="zone1"></div>
+            <div id="sketchzone-inspector-contents"></div>
           </div>
         </div>
       </div>

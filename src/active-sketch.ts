@@ -1,25 +1,32 @@
 import { EditorState, Extension } from '@codemirror/state';
 import { EditorView, ViewUpdate } from '@codemirror/view';
-import type { DOCUMENT, SessionObject } from './storage.js';
+import type { DOCUMENT, SketchObject } from './storage.js';
+import type { Inspector } from './inspector.ts';
 
 const EDITOR_SYNC_DEBOUNCE_MS = 250;
 
-interface ActiveSessionData<SessionData> {
-  client: SessionData;
-  isClientOutOfDate: boolean;
+interface ActiveSketchInspectorState {
+  inspector: Inspector;
+  isInspectorOutOfDate: boolean;
 }
 
-export default class ActiveSession<SessionData> {
+/**
+ * An ActiveSketch is a tab that has additional resources beyond what's
+ * stored in the database: an active codemirrorState (that keeps stuff
+ * like undo history) and any data by the currently loaded Inspector.
+ */
+export default class ActiveSketch {
   key: IDBValidKey;
   title: string;
   readonly active: true = true;
-  sessionData: null | ActiveSessionData<SessionData> = null;
+  inspectorState: null | ActiveSketchInspectorState = null;
   codemirrorState: EditorState;
 
   private readonly documentCreatedAt: Date;
   documentUpdatedAt: Date;
   private persistSyncTimeout: ReturnType<typeof setTimeout> | null = null;
   private extractTitleFromDoc: (doc: DOCUMENT) => string;
+  private createAndMountInspector: (doc: DOCUMENT) => Inspector;
 
   private immediatelyRead() {
     const doc: string = this.codemirrorState.doc.toString();
@@ -33,7 +40,8 @@ export default class ActiveSession<SessionData> {
 
   constructor(
     key: IDBValidKey,
-    session: SessionObject,
+    sketch: SketchObject,
+    createAndMountInspector: (doc: DOCUMENT) => Inspector,
     codemirrorExtensions: Extension[],
     triggerRedraw: () => void,
     triggerStorage: (
@@ -44,9 +52,10 @@ export default class ActiveSession<SessionData> {
     ) => Promise<void>,
     extractTitleFromDoc: (doc: DOCUMENT) => string,
   ) {
-    this.documentCreatedAt = session.createdAt;
-    this.documentUpdatedAt = session.updatedAt;
-    this.title = extractTitleFromDoc(session.document);
+    this.createAndMountInspector = createAndMountInspector;
+    this.documentCreatedAt = sketch.createdAt;
+    this.documentUpdatedAt = sketch.updatedAt;
+    this.title = extractTitleFromDoc(sketch.document);
     this.key = key;
     this.extractTitleFromDoc = extractTitleFromDoc;
 
@@ -56,8 +65,8 @@ export default class ActiveSession<SessionData> {
           this.codemirrorState = update.state;
           if (update.docChanged) {
             this.documentUpdatedAt = new Date();
-            if (this.sessionData !== null && !this.sessionData.isClientOutOfDate) {
-              this.sessionData.isClientOutOfDate = true;
+            if (this.inspectorState !== null && !this.inspectorState.isInspectorOutOfDate) {
+              this.inspectorState.isInspectorOutOfDate = true;
             }
             if (this.persistSyncTimeout !== null) {
               clearTimeout(this.persistSyncTimeout);
@@ -75,10 +84,39 @@ export default class ActiveSession<SessionData> {
           }
         }),
       ]),
-      doc: typeof session.document === 'string' ? session.document : '<object placeholder>',
+      doc: typeof sketch.document === 'string' ? sketch.document : '<object placeholder>',
     });
   }
 
-  /** Called when the tab containing this ActiveSession is removed. Currently does nothing. */
-  terminate() {}
+  load(doc: DOCUMENT) {
+    if (this.inspectorState) {
+      this.inspectorState.inspector.reload(doc);
+    } else {
+      this.inspectorState = {
+        isInspectorOutOfDate: false,
+        inspector: this.createAndMountInspector(doc),
+      };
+    }
+  }
+
+  async blur() {
+    if (this.inspectorState) {
+      if (await this.inspectorState.inspector.unmount()) {
+        this.inspectorState = null;
+      }
+    }
+  }
+
+  async focus() {
+    if (this.inspectorState) {
+      await this.inspectorState.inspector.remount();
+    }
+  }
+
+  async terminate() {
+    if (this.inspectorState) {
+      await this.inspectorState.inspector.destroy();
+      this.inspectorState = null;
+    }
+  }
 }

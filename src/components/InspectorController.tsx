@@ -3,12 +3,22 @@ import { EnterIcon, MagnifyingGlassIcon, ReaderIcon } from '@radix-ui/react-icon
 interface Props {
   state: 'unloaded' | 'loaded' | 'modified';
   iconSize: string;
+  onLoad: () => void;
 }
 
-export default function InspectorController({ state, iconSize }: Props) {
+export default function InspectorController({ state, iconSize, onLoad }: Props) {
   return (
     <>
-      <button id="sessionzone-inspector-load" title={`Load program`}>
+      <button
+        id="sketchzone-inspector-load"
+        title={`Load program`}
+        onClick={(event) => {
+          event.preventDefault();
+          document.getElementById('sketchzone-active-sketch')!.className =
+            'active-sketch-is-showing-inspector';
+          onLoad();
+        }}
+      >
         <EnterIcon width={iconSize} height={iconSize} />
         {state === 'unloaded'
           ? `load program`
@@ -17,12 +27,12 @@ export default function InspectorController({ state, iconSize }: Props) {
           : `program changed! reload?`}
       </button>
       <button
-        id="sessionzone-inspector-view"
+        id="sketchzone-inspector-view"
         title={`View program`}
         onClick={(event) => {
           event.preventDefault();
-          document.getElementById('sessionzone-active-session')!.className =
-            'active-session-is-showing-editor';
+          document.getElementById('sketchzone-active-sketch')!.className =
+            'active-sketch-is-showing-editor';
         }}
       >
         <ReaderIcon width={iconSize} height={iconSize} />
@@ -30,12 +40,12 @@ export default function InspectorController({ state, iconSize }: Props) {
       </button>
       {state !== 'unloaded' && (
         <button
-          id="sessionzone-inspector-inspect"
+          id="sketchzone-inspector-inspect"
           title={`Inspect program without reloading`}
           onClick={(event) => {
             event.preventDefault();
-            document.getElementById('sessionzone-active-session')!.className =
-              'active-session-is-showing-inspector';
+            document.getElementById('sketchzone-active-sketch')!.className =
+              'active-sketch-is-showing-inspector';
           }}
         >
           <MagnifyingGlassIcon width={iconSize} height={iconSize} />

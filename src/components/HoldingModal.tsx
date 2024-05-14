@@ -1,5 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 
 /**
@@ -21,7 +22,7 @@ export default function holdForModal(
 
   return new Promise<void>((resolve) => {
     view.render(
-      (() => {
+      React.createElement(() => {
         return (
           <Dialog.Root
             open
@@ -45,7 +46,7 @@ export default function holdForModal(
             </Dialog.Portal>
           </Dialog.Root>
         );
-      })(),
+      }),
     );
   });
 }

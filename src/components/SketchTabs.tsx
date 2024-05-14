@@ -1,4 +1,6 @@
 import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
+// @ts-ignore: 'React' is declared but its value is never read.
+import React from 'react';
 
 import type { TabsObject } from '../storage.js';
 

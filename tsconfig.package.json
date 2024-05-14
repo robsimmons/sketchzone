@@ -10,6 +10,7 @@
     "outDir": "lib",
     "declaration": true,
     "esModuleInterop": true,
+    "jsx": "react",
 
     /* Linting */
     "strict": true,

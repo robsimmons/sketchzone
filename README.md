@@ -18,7 +18,7 @@ This is fundamentally made for an audience of one (me), but [reach out](https://
 
 Your job if you're using this library is to implement the types in [impelementer-types.ts](src/implementer-types.ts). Specifically, you need to provide a function `createAndMountInspector` that takes a DOM element and a string document, creates and mounts the inspector to the given DOM element, and optionally returns an `Inspector` object.
 
-I highly recommend using your own codemirror extensions rather than relying on the defaults.
+I highly recommend using your own codemirror extensions rather than relying on the defaults:
 
 ```javascript
 import { EditorView, keymap, lineNumbers } from '@codemirror/view';
@@ -32,9 +32,11 @@ const codemirrorExtensions = [
 ];
 ```
 
-- `documentName` - what should the UI call a "document" (probably `"document"` or `"program"`)
-- `appName` - what do you call your app or language?
-- ``
+## Examples
+
+These examples are all built on Glitch as a static site that uses [Vite](https://vitejs.dev/) to roll up sessionzone's dependencies on React and Codemirror.
+
+- [Simplest possible example](https://glitch.com/edit/?#!/sketchzone-simplest)
 
 # Structure
 
@@ -58,7 +60,7 @@ The app assumes it has full control over the window, and that the body of the HT
 
 ```html
 <body id="body-root">
-  <main id="main-root" class="config-menu-is-closed">
+  <main id="main-root">
     <div id="sketchzone-config"></div>
     <div id="sketchzone-container">
       <div id="sketchzone-header">
@@ -174,4 +176,3 @@ body {
   --sketchzone-light-overlay: oklch(52% 0 0 / 30%);
 }
 ```
-

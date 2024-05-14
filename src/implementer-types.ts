@@ -27,7 +27,7 @@ export interface SetupProps {
    * ```
    *
    */
-  codemirrorExtensions: Extension[];
+  codemirrorExtensions?: Extension[];
 
   /**
    * sketchzone follows the GraphiQL convention of pulling the tab title out of the

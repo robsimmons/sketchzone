@@ -1,6 +1,6 @@
 {
   "name": "sketchzone",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",
@@ -14,7 +14,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "dist": "tsc --jsx react-jsx --project tsconfig.package.json"
+    "dist": "tsc --project tsconfig.package.json"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",

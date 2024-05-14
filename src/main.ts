@@ -1,7 +1,8 @@
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+import type { Extension } from '@codemirror/state';
+import { EditorView, keymap, lineNumbers } from '@codemirror/view';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import type { Extension } from '@codemirror/state';
-import { EditorView } from '@codemirror/view';
 
 import ActiveSketch from './active-sketch.js';
 import ConfigMenu from './components/ConfigMenu.js';
@@ -383,7 +384,12 @@ export async function setup(options: SetupProps) {
     emptyDocument,
     extractTitleFromDoc,
     options.createAndMountInspector,
-    options.codemirrorExtensions,
+    options.codemirrorExtensions ?? [
+      lineNumbers(),
+      history(),
+      EditorView.lineWrapping,
+      keymap.of([...defaultKeymap, ...historyKeymap]),
+    ],
     options.documentName ?? 'document',
     title,
     options.infoUrl,

@@ -7,12 +7,13 @@ interface Props {
   db: IDBDatabase;
   restore: (key: IDBValidKey) => Promise<void>;
   share: () => Promise<string>;
+  documentName: string,
   custom?: JSX.Element;
 }
 
 const BUTTON_ICON_SIZE = '24px';
 
-export default function ConfigMenu({ db, restore, share }: Props) {
+export default function ConfigMenu({ db, restore, share, documentName }: Props) {
   const [open, setOpen] = React.useState(false);
   const [sketches, setSketches] = React.useState<
     null | { key: IDBValidKey; value: SketchObject }[]
@@ -70,7 +71,7 @@ export default function ConfigMenu({ db, restore, share }: Props) {
           <Dialog.Content className="sketchzone-dialog-content sketchzone-config-load">
             <Dialog.Title>History</Dialog.Title>
             <VisuallyHidden>
-              <Dialog.Description>Pick a previously-opened program to re-open</Dialog.Description>
+              <Dialog.Description>Pick a previously-opened {documentName} to re-open</Dialog.Description>
             </VisuallyHidden>
             {sketches === null ? (
               'loading...'

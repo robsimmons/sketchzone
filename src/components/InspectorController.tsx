@@ -3,15 +3,17 @@ import { EnterIcon, MagnifyingGlassIcon, ReaderIcon } from '@radix-ui/react-icon
 interface Props {
   state: 'unloaded' | 'loaded' | 'modified';
   iconSize: string;
+  documentName: string;
   onLoad: () => void;
 }
 
-export default function InspectorController({ state, iconSize, onLoad }: Props) {
+export default function InspectorController({ state, iconSize, onLoad, documentName }: Props) {
+  console.log(`rendering ${state}`)
   return (
     <>
       <button
         id="sketchzone-inspector-load"
-        title={`Load program`}
+        title={`Load ${documentName}`}
         onClick={(event) => {
           event.preventDefault();
           document.getElementById('sketchzone-active-sketch')!.className =
@@ -21,14 +23,14 @@ export default function InspectorController({ state, iconSize, onLoad }: Props) 
       >
         <EnterIcon width={iconSize} height={iconSize} />
         {state === 'unloaded'
-          ? `load program`
+          ? `load ${documentName}`
           : state === 'loaded'
-          ? `reload program`
-          : `program changed! reload?`}
+          ? `reload ${documentName}`
+          : `${documentName} changed! reload?`}
       </button>
       <button
         id="sketchzone-inspector-view"
-        title={`View program`}
+        title={`View ${documentName}`}
         onClick={(event) => {
           event.preventDefault();
           document.getElementById('sketchzone-active-sketch')!.className =
@@ -36,12 +38,12 @@ export default function InspectorController({ state, iconSize, onLoad }: Props) 
         }}
       >
         <ReaderIcon width={iconSize} height={iconSize} />
-        view program
+        view {documentName}
       </button>
       {state !== 'unloaded' && (
         <button
           id="sketchzone-inspector-inspect"
-          title={`Inspect program without reloading`}
+          title={`Inspect without reloading`}
           onClick={(event) => {
             event.preventDefault();
             document.getElementById('sketchzone-active-sketch')!.className =

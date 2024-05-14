@@ -1,8 +1,10 @@
+import type { DOCUMENT } from './document.js';
+
 /* From Jason Reed in the twelf-wasm repository */
 
-export type UrlHashAction<Doc> = { t: 'open'; document: Doc };
-export type UrlGeneralAction<Doc> = UrlHashAction<Doc> | { t: 'getUrl'; url: string };
-export type UrlHashActionWithError<Doc> = UrlHashAction<Doc> | { t: 'error'; msg: string };
+export type UrlHashAction = { t: 'open'; document: DOCUMENT };
+export type UrlGeneralAction = UrlHashAction | { t: 'getUrl'; url: string };
+export type UrlHashActionWithError = UrlHashAction | { t: 'error'; msg: string };
 
 type Base64 = { t: 'base64'; str: string };
 
@@ -66,16 +68,13 @@ function streamOfBytes(bytes: Uint8Array): ReadableStream {
   return new Blob([bytes]).stream();
 }
 
-async function encodeWithJsonz<Doc>(action: UrlGeneralAction<Doc>): Promise<string> {
+async function encodeWithJsonz(action: UrlGeneralAction): Promise<string> {
   return encodeURIComponent(
     base64OfBytes(await compressedOf(bytesOfString(JSON.stringify(action)))).str,
   );
 }
 
-function validateUrlHashAction<Doc>(
-  input: any,
-  validateDoc?: (blob: any) => null | string,
-): UrlHashActionWithError<Doc> {
+function validateUrlHashAction(input: any): UrlHashActionWithError {
   if (typeof input !== 'object') {
     return { t: 'error', msg: 'Expected hashAction to be an object, got a ' + typeof input };
   }
@@ -84,61 +83,49 @@ function validateUrlHashAction<Doc>(
   }
 
   if (input.t === 'open') {
-    const docValidationErrorMsg = validateDoc && validateDoc(input.document);
-    if (docValidationErrorMsg) {
+    if (typeof input.open === 'string') {
       return {
         t: 'error',
-        msg: docValidationErrorMsg,
+        msg: 'The document did not have the expect format (a string)',
       };
     }
-    return { t: 'open', document: input.document as Doc };
+    return { t: 'open', document: input.document };
   }
   return { t: 'error', msg: 'Unexpected type field in hash action: ' + input.t };
 }
 
-async function performGeneralAction<Doc>(
-  hashAction: any,
-  validateDoc?: (blob: any) => null | string,
-): Promise<UrlHashActionWithError<Doc> | null> {
+async function performGeneralAction(hashAction: any): Promise<UrlHashActionWithError | null> {
   if (hashAction && hashAction.t === 'getUrl' && typeof hashAction.url === 'string') {
     const response = await fetch(hashAction.url);
     const json = await response.json();
-    return validateUrlHashAction(json, validateDoc);
+    return validateUrlHashAction(json);
   }
-  return validateUrlHashAction(hashAction, validateDoc);
+  return validateUrlHashAction(hashAction);
 }
 
-async function decodeWithJsonz<Doc>(
-  fragment: string,
-  validateDoc?: (blob: any) => null | string,
-): Promise<UrlHashActionWithError<Doc> | null> {
+async function decodeWithJsonz(fragment: string): Promise<UrlHashActionWithError | null> {
   if (!fragment.matchAll(/[A-Za-z0-9\-_]*/g)) {
     return { t: 'error', msg: 'Fragment was not a valid Base64 string' };
   }
 
   return await performGeneralAction(
     JSON.parse(stringOfBytes(await decompressedOf(bytesOfBase64({ t: 'base64', str: fragment })))),
-    validateDoc,
   );
 }
 
-async function decodeWithJson<Doc>(
-  fragment: string,
-  validateDoc?: (blob: any) => null | string,
-): Promise<UrlHashActionWithError<Doc> | null> {
+async function decodeWithJson(fragment: string): Promise<UrlHashActionWithError | null> {
   if (!fragment.matchAll(/[A-Za-z0-9\-_]*/g)) {
     return { t: 'error', msg: 'Fragment was not a valid Base64 string' };
   }
   return await performGeneralAction(
     JSON.parse(atob(fragment.replaceAll('-', '+').replaceAll('_', '/'))),
-    validateDoc,
   );
 }
 
 /**
  * Efficiently encodes a URL hash action
  */
-export async function encodeUrlHashAction<Doc>(action: UrlGeneralAction<Doc>): Promise<string> {
+export async function encodeUrlHashAction(action: UrlGeneralAction): Promise<string> {
   return '#jsonz=' + (await encodeWithJsonz(action));
 }
 
@@ -146,15 +133,12 @@ export async function encodeUrlHashAction<Doc>(action: UrlGeneralAction<Doc>): P
  * Decode the hash fragment for an editor
  *
  * @param hashFragment The contents of `window.location.hash`
- * @param validateDoc An optional validation function that makes sure the document has
- * the expected form of a Doc. Otherwise we'll just assume.
  * @returns null if there's no hash, or if the hash doesn't include an equals sign so is
  * unlikely to be valid. Otherwise returns a hash action or error.
  */
-export async function decodeUrlHashAction<Doc>(
+export async function decodeUrlHashAction(
   hashFragment: string,
-  validateDoc?: (blob: any) => null | string,
-): Promise<UrlHashActionWithError<Doc> | null> {
+): Promise<UrlHashActionWithError | null> {
   const sep = hashFragment.indexOf('=');
   if (!hashFragment.startsWith('#') || sep === -1) return null;
   const key = hashFragment.slice(1, sep);
@@ -162,20 +146,13 @@ export async function decodeUrlHashAction<Doc>(
   try {
     if (key === 'program') {
       const doc = decodeURIComponent(value);
-      const docValidationErrorMsg = validateDoc && validateDoc(doc);
-      if (docValidationErrorMsg) {
-        return {
-          t: 'error',
-          msg: docValidationErrorMsg,
-        };
-      }
-      return { t: 'open', document: doc as Doc };
+      return { t: 'open', document: doc };
     }
     if (key === 'jsonz') {
-      return await decodeWithJsonz(value, validateDoc);
+      return await decodeWithJsonz(value);
     }
     if (key === 'json') {
-      return await decodeWithJson(value, validateDoc);
+      return await decodeWithJson(value);
     }
     return {
       t: 'error',

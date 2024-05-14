@@ -1,13 +1,16 @@
 import { EditorState, Extension } from '@codemirror/state';
 import { EditorView, ViewUpdate } from '@codemirror/view';
-import type { DOCUMENT, SketchObject } from './storage.js';
-import type { Inspector } from './inspector.ts';
+
+import type { DOCUMENT } from './document.js';
+import type { SketchObject } from './storage.js';
+import type { Inspector } from './implementer-types.js';
 
 const EDITOR_SYNC_DEBOUNCE_MS = 250;
 
 interface ActiveSketchInspectorState {
   inspector: Inspector;
   isInspectorOutOfDate: boolean;
+  root: HTMLDivElement;
 }
 
 /**
@@ -26,7 +29,7 @@ export default class ActiveSketch {
   documentUpdatedAt: Date;
   private persistSyncTimeout: ReturnType<typeof setTimeout> | null = null;
   private extractTitleFromDoc: (doc: DOCUMENT) => string;
-  private createAndMountInspector: (doc: DOCUMENT) => Inspector;
+  private createAndMountInspector: (elem: HTMLDivElement, doc: DOCUMENT) => Inspector | void;
 
   private immediatelyRead() {
     const doc: string = this.codemirrorState.doc.toString();
@@ -41,7 +44,7 @@ export default class ActiveSketch {
   constructor(
     key: IDBValidKey,
     sketch: SketchObject,
-    createAndMountInspector: (doc: DOCUMENT) => Inspector,
+    createAndMountInspector: (elem: HTMLDivElement, doc: DOCUMENT) => Inspector | void,
     codemirrorExtensions: Extension[],
     triggerRedraw: () => void,
     triggerStorage: (
@@ -84,38 +87,53 @@ export default class ActiveSketch {
           }
         }),
       ]),
-      doc: typeof sketch.document === 'string' ? sketch.document : '<object placeholder>',
+      doc: sketch.document,
     });
   }
 
-  load(doc: DOCUMENT) {
+  async load(doc: DOCUMENT) {
     if (this.inspectorState) {
-      this.inspectorState.inspector.reload(doc);
-    } else {
-      this.inspectorState = {
-        isInspectorOutOfDate: false,
-        inspector: this.createAndMountInspector(doc),
-      };
+      if (this.inspectorState.inspector.reload) {
+        await this.inspectorState.inspector.reload(doc);
+        return;
+      } else {
+        if (!(await this.inspectorState.inspector.unmount?.())) {
+          await this.inspectorState.inspector.destroy?.();
+        }
+        this.inspectorState = null;
+        document.getElementById('sketchzone-inspector-contents')!.innerHTML = '';
+        // Fallthrough!
+      }
     }
+
+    const root = document.createElement('div');
+    this.inspectorState = {
+      isInspectorOutOfDate: false,
+      inspector: this.createAndMountInspector(root, doc) ?? {},
+      root,
+    };
+    document.getElementById('sketchzone-inspector-contents')!.appendChild(this.inspectorState.root);
   }
 
   async blur() {
     if (this.inspectorState) {
-      if (await this.inspectorState.inspector.unmount()) {
+      if (await this.inspectorState.inspector.unmount?.()) {
         this.inspectorState = null;
       }
     }
+    document.getElementById('sketchzone-inspector-contents')!.innerHTML = '';
   }
 
   async focus() {
     if (this.inspectorState) {
-      await this.inspectorState.inspector.remount();
+      document.getElementById('sketchzone-inspector-contents')!.append(this.inspectorState.root);
+      await this.inspectorState.inspector.remount?.();
     }
   }
 
   async terminate() {
     if (this.inspectorState) {
-      await this.inspectorState.inspector.destroy();
+      await this.inspectorState.inspector.destroy?.();
       this.inspectorState = null;
     }
   }

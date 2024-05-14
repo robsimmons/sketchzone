@@ -188,7 +188,7 @@ button:hover {
 }
 
 /* Config area outside of the rounded rect in zone 1 */
-.sketchzone-config {
+#sketchzone-config {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -255,7 +255,7 @@ button:hover {
 }
 
 /* The rounded rect contains both tabs and the active sketch */
-.sketchzone-container {
+#sketchzone-container {
   border-radius: calc(var(--sketchzone-radius) + var(--sketchzone-small-padding));
   padding: var(--sketchzone-small-padding);
   display: grid;
@@ -267,12 +267,12 @@ button:hover {
 }
 
 /* Header */
-.sketchzone-header {
+#sketchzone-header {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: var(--sketchzone-small-padding);
 }
-.sketchzone-logo {
+#sketchzone-logo {
   font-size: 1.5rem;
   line-height: 1.5rem;
   margin-block: auto;
@@ -280,7 +280,7 @@ button:hover {
   padding-right: var(--sketchzone-large-padding);
 }
 
-.sketchzone-tabs {
+#sketchzone-tabs {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: var(--sketchzone-small-padding);

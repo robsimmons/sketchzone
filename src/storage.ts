@@ -1,16 +1,6 @@
-import { UrlHashAction } from './hash-action.js';
+import type { DOCUMENT } from './document.ts';
+import type { UrlHashAction } from './hash-action.js';
 
-/**
- * Weird placeholder type of documents. Documents are "really" just strings, and documents
- * need to be able to kinda-sort be strings to support the #program=blahblah hash action.
- *
- * However, I also want a document to be able to be a primary document + a few auxillary
- * documents, like the GraphiQL "headers" and "variables".
- *
- * Therefore, DOCUMENT is just a placeholder, to try and keep the code from overly-encoding
- * the assumption that a document is specifically a string.
- */
-export type DOCUMENT = string | { t: 'empty' };
 export const SKETCHES_DB = 'sketches';
 export const TABS_DB = 'tabs';
 
@@ -52,10 +42,7 @@ export function storeSketch(sketchStore: IDBObjectStore, key: IDBValidKey, value
     request.onsuccess = resolve;
   });
 }
-export function addSketch(
-  sketchStore: IDBObjectStore,
-  value: SketchObject,
-): Promise<IDBValidKey> {
+export function addSketch(sketchStore: IDBObjectStore, value: SketchObject): Promise<IDBValidKey> {
   return new Promise<IDBValidKey>((resolve, reject) => {
     const request = sketchStore.add(value);
     request.onerror = reject;
@@ -64,7 +51,7 @@ export function addSketch(
 }
 
 export async function initializeStorage(
-  hashAction: null | UrlHashAction<DOCUMENT>,
+  hashAction: null | UrlHashAction,
   defaultEntries: DOCUMENT[] /* Non-empty */,
   extractTitleFromDoc: (doc: DOCUMENT) => string,
   warnUser: (message: string[]) => Promise<void>,

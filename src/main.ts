@@ -8,8 +8,8 @@ import holdForModal from './components/HoldingModal.js';
 import InspectorController from './components/InspectorController.js';
 import setupDivider from './components/Divider.js';
 import SketchTabs from './components/SketchTabs.js';
+import type { DOCUMENT } from './document.js';
 import {
-  DOCUMENT,
   SKETCHES_DB,
   SketchObject,
   TABS_DB,
@@ -20,7 +20,8 @@ import {
   storeSketch,
   storeTabs,
 } from './storage.js';
-import type { Inspector } from './inspector.js';
+import type { Inspector, SetupProps } from './implementer-types.js';
+import { render } from 'react-dom';
 
 const ICON_SIZE = '24px';
 
@@ -28,12 +29,8 @@ const ICON_SIZE = '24px';
  * Interact with all the decoding nonsense in hash-action.ts, return a hash
  * action or null if there's no hash action.
  */
-async function readActionFromURLHash(): Promise<UrlHashAction<DOCUMENT> | null> {
-  const hashActionOrError = await decodeUrlHashAction<DOCUMENT>(window.location.hash, (blob) => {
-    if (typeof blob === 'string') return null;
-    if (JSON.stringify(blob) === '{"t":"empty"}') return null;
-    return 'The document did not have the expect format (a string)';
-  });
+async function readActionFromURLHash(): Promise<UrlHashAction | null> {
+  const hashActionOrError = await decodeUrlHashAction(window.location.hash);
   if (hashActionOrError?.t === 'error') {
     await holdForModal(
       'Could not open URL hash',
@@ -58,8 +55,9 @@ async function readActionFromURLHash(): Promise<UrlHashAction<DOCUMENT> | null> 
 async function setupEditorInteractions(
   emptyDocument: () => DOCUMENT,
   extractTitleFromDoc: (doc: DOCUMENT) => string,
-  createAndMountInspector: (doc: DOCUMENT) => Inspector,
+  createAndMountInspector: (elem: HTMLDivElement, doc: DOCUMENT) => Inspector | void,
   codemirrorExtensions: Extension[],
+  documentName: string,
   title: string,
   db: IDBDatabase,
   initialTabs: TabsObject,
@@ -131,6 +129,8 @@ async function setupEditorInteractions(
   const inspectorControllerRoot = ReactDOM.createRoot(
     document.getElementById('sketchzone-inspector-controller')!,
   );
+  document.getElementById('sketchzone-active-sketch')!.className =
+    'active-sketch-is-showing-editor';
   function renderInspectorController() {
     const state =
       displayedSketch.current.inspectorState === null
@@ -142,8 +142,13 @@ async function setupEditorInteractions(
       InspectorController({
         state,
         iconSize: ICON_SIZE,
-        onLoad: () =>
-          displayedSketch.current.load(displayedSketch.current.codemirrorState.doc.toString()),
+        onLoad: async () => {
+          await displayedSketch.current.load(
+            displayedSketch.current.codemirrorState.doc.toString(),
+          );
+          setTimeout(renderInspectorController);
+        },
+        documentName,
       }),
     );
   }
@@ -254,10 +259,7 @@ async function setupEditorInteractions(
             changes: {
               from: 0,
               to: displayedSketch.current.codemirrorState.doc.length,
-              insert:
-                typeof rememberedSketch.document === 'string'
-                  ? rememberedSketch.document
-                  : '<object placeholder>',
+              insert: typeof rememberedSketch.document,
             },
           });
           if (displayedSketch.current.inspectorState !== null) {
@@ -307,7 +309,6 @@ async function setupEditorInteractions(
       if (!found) {
         const sketchStore = db.transaction([SKETCHES_DB], 'readonly').objectStore(SKETCHES_DB);
         const rememberedSketch = await getSketch(sketchStore, sketchKey);
-        console.log(rememberedSketch);
         tabs.current = {
           displayedSketchIndex: tabs.current.sketches.length,
           sketches: tabs.current.sketches.concat([
@@ -327,7 +328,7 @@ async function setupEditorInteractions(
       await restoreFromTabs();
     },
     share: async () => {
-      window.location.hash = await encodeUrlHashAction<DOCUMENT>({
+      window.location.hash = await encodeUrlHashAction({
         t: 'open',
         document: displayedSketch.current.codemirrorState.doc.toString(),
       });
@@ -337,22 +338,25 @@ async function setupEditorInteractions(
   };
 }
 
-export async function setup(options: {
-  emptyDocument: () => DOCUMENT;
-  extractTitleFromDoc: (doc: DOCUMENT) => string;
-  createAndMountInspector: (doc: DOCUMENT) => Inspector;
-  codemirrorExtensions: Extension[];
-  defaultEntries?: DOCUMENT[];
-  title?: string;
-}) {
+export async function setup(options: SetupProps) {
   // Set up storage
-  const title = options.title ?? document.title;
-  document.getElementById('sketchzone-logo')!.innerText = title;
-  const hashAction: UrlHashAction<DOCUMENT> | null = await readActionFromURLHash();
+  const title = options.appName ?? document.title;
+  if (document.getElementById('sketchzone-logo')!.innerText === '') {
+    document.getElementById('sketchzone-logo')!.innerText = title;
+  }
+  const emptyDocument: () => DOCUMENT = options.emptyDocument ?? (() => '');
+  const extractTitleFromDoc =
+    options.extractTitleFromDoc ??
+    ((doc: DOCUMENT) => {
+      const firstLine = doc.split('\n')[0].trim();
+      if (firstLine === '') return '<unnamed>';
+      return firstLine;
+    });
+  const hashAction: UrlHashAction | null = await readActionFromURLHash();
   const { db, tabs, sketch } = await initializeStorage(
     hashAction,
-    options.defaultEntries ?? [options.emptyDocument()],
-    options.extractTitleFromDoc,
+    options.defaultEntries ?? [emptyDocument()],
+    extractTitleFromDoc,
     (messages) => holdForModal('Error loading workspace', messages[0], messages.slice(1)),
   );
 
@@ -361,10 +365,11 @@ export async function setup(options: {
 
   // Set up the hairy ball of multiple-sketch-management wax
   return await setupEditorInteractions(
-    options.emptyDocument,
-    options.extractTitleFromDoc,
+    emptyDocument,
+    extractTitleFromDoc,
     options.createAndMountInspector,
     options.codemirrorExtensions,
+    options.documentName ?? 'document',
     title,
     db,
     tabs,

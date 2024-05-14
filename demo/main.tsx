@@ -1,11 +1,10 @@
-import ConfigMenu from '../src/components/Config.tsx';
-import { setup } from '../src/main.js';
 import ReactDOM from 'react-dom/client';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
-import { Extension } from '@codemirror/state';
 import { EditorView, keymap, lineNumbers } from '@codemirror/view';
-import { Inspector } from '../src/inspector.ts';
-import { DOCUMENT } from '../src/storage.ts';
+
+import ConfigMenu from '../src/components/Config.tsx';
+import type { DOCUMENT } from '../src/document.js';
+import { setup } from '../src/main.js';
 
 const lorem = (input: number | string) =>
   `
@@ -27,53 +26,29 @@ tellus integer feugiat scelerisque varius. Tempor
 orci dapibus ultrices in iaculis nunc sed.
 `.trim();
 
-export const codemirrorExtensions: Extension[] = [
-  lineNumbers(),
-  history(),
-  EditorView.lineWrapping,
-  keymap.of([...defaultKeymap, ...historyKeymap]),
-];
-
 function getHTML(doc: DOCUMENT, loads: number) {
   return `<div class="sketchzone-rounded-inspector">
     <div>There is/are ${`${doc}`.split('\n').length} line(s)</div>
     <div>You've loaded this document ${loads} times</div>
   </div>`;
 }
-function newInspector(doc: DOCUMENT): Inspector {
-  const root = document.getElementById('sketchzone-inspector-contents')!;
+
+function createAndMountInspector(root: HTMLDivElement, doc: DOCUMENT): void {
   let loads = 1;
   root.innerHTML = getHTML(doc, loads);
-
-  return {
-    reload: async (newDoc) => {
-      loads += 1;
-      doc = newDoc;
-      root.innerHTML = getHTML(doc, loads);
-    },
-    unmount: async () => {
-      root.innerHTML = '';
-    },
-    remount: async () => {
-      root.innerHTML = getHTML(doc, loads);
-    },
-    destroy: async () => {},
-  };
 }
 
 const { db, restore, share } = await setup({
-  extractTitleFromDoc: (document) => {
-    if (typeof document !== 'string') return '<empty placeholder>';
-    const firstLine = document.split('\n')[0].trim();
-    if (firstLine === '') return '<unnamed>';
-    return firstLine;
-  },
-  emptyDocument: () => '',
-  createAndMountInspector: newInspector,
-  codemirrorExtensions,
+  createAndMountInspector,
+  codemirrorExtensions: [
+    lineNumbers(),
+    history(),
+    EditorView.lineWrapping,
+    keymap.of([...defaultKeymap, ...historyKeymap]),
+  ],
   defaultEntries: [lorem(1), lorem(2), lorem(3)],
-  title: 'MyEd',
+  appName: 'sketchzone',
 });
 
-const configRoot = ReactDOM.createRoot(document.getElementById('sketchzone-config-root')!);
-configRoot.render(<ConfigMenu db={db} restore={restore} share={share} />);
+const configRoot = ReactDOM.createRoot(document.getElementById('sketchzone-config')!);
+configRoot.render(<ConfigMenu db={db} restore={restore} share={share} documentName="document" />);

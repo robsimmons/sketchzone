@@ -1,56 +1,86 @@
-The `sketchzone` package is initially intended to encapsulate the "non-dusa" parts of the [dusa.rocks](https://dusa.rocks) editor, but also a project that aims to help me out with the fact that I seem to continually spawn browser-based web editors to allow text to be edited side-by-side with some computational artifact that is in conversation with that text.
+# sketchzone
 
-Here are a few examples, so you see what I mean:
+You want to create a little inspector for your programming language or data structure or something: your user writes some text document and you will use your "inspector" to show them something --- some JavaScript widget that will render something based on the text the user provided provided.
 
-- [Tutch](https://retutch.github.io/), a re-implementation of [Andreas Abel's Tutch](https://www2.tcs.ifi.lmu.de/~abel/tutch/)
-- [Jaco](https://c0.surge.sh/), a re-implementation of the [C0 language](https://c0.cs.cmu.edu/docs/c0-reference.pdf)
-- [Dusa](https://dusa.rocks/docs/), a logic programming language designed by Chris Martens and myself
-- Multiple internal projects that I worked on from anywhere from a few days to a few years years at places like Brilliant.org
-- Multiple iterations of the [Twelf Live](https://jcreedcmu.github.io/twelf-wasm/) idea, the most recent of which was primarly implemented by Jason Reed
+The sketchzone package is intended to encapsulate a bunch of "price of entry" quality-of-life issues that a browser-based implementation of such a tool is going to encounter. You provide the inspector, and sketchzone provides:
 
-Furthermore, this is a pattern that other people continuously come up with
+- Codemirror integration for the editor
+- Persistance of multiple sketches via IndexedDB
+- Multiple tabs
+- Browse/reopen closed documents
+- Sharing links using URL hashes
+- A mobile-friendly mode that switches between the editor and inspector
+- Light/dark mode
 
-- [Ellie](https://ellie-app.com/new) for testing out Elm
-- [The p5.js editor](https://editor.p5js.org/) for testing out p5.js
-- [GraphiQL](https://github.com/graphql/graphiql) for interacting with GraphQL servers
-- [MicroCeptre](https://microceptre.glitch.me/) is a bit different, because it's a structure editor and not a text editor, but it has similar vibes
+This is fundamentally made for an audience of one --- me --- so [reach out](https://social.wub.site/@simrob) if you'd like to use it yourself and run into trouble. sketchzone is currently licensed under the GPL-3 and CC-BY-NC-SA licenses (whichever you prefer), but if neither of those licenses work for you [let me know](https://social.wub.site/@simrob).
 
-But there's a high barrier to entry for doing each of these things reasonably well! If you want to make one of these things, you've got to deal with:
+## Implementing an inspector
 
-- Text editing: you can start with a `<textarea>`, but it is unlikely to be satisfying for long
-- Persistent storage (so that your work doesn't disappear when your browser crashes)
-- Synchronizing state between your text editing solution, storage, and whatever interpreter/inspector/explorer you're using
-- Link sharing: how will you get your examples from your computer to my computer?
-- Mobile friendliness?
-- Dark mode?!?!
+Your job if you're using this library is to implement the types in [impelementer-types.ts](src/implementer-types.ts). Specifically, you need to provide a function `createAndMountInspector` that takes a DOM element and a string document, creates and mounts the inspector to the given DOM element, and optionally returns an `Inspector` object.
 
-I don't have any illusions I'm making the one true solution that everyone else is going to adopt: the goal for this project is to allow me, personally, to start my next "write some text and have some kind of interpreted inspector view" without spending any time working on a web design project that's 100% unrelated to the actual task I want to accomplish.
+I highly recommend using your own codemirror extensions rather than relying on the defaults.
 
-# Concepts
+```javascript
+import { EditorView, keymap, lineNumbers } from '@codemirror/view';
+import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+const codemirrorExtensions = [
+  lineNumbers(),
+  history(),
+  EditorView.lineWrapping,
+  keymap.of([...defaultKeymap, ...historyKeymap]),
+];
+```
 
-There's only one relevant word that actual end users need to understand: the name of the thing in the editor that gets loaded when one presses the button that says "load." This is currently "program" but will definitely need to be generalized. (In P5.js this would be "sketch", in a JSON viewer this would be "JSON".) Internally, this thing is called a document, and the document is edited in the editor.
+- `documentName` - what should the UI call a "document" (probably `"document"` or `"program"`)
+- `appName` - what do you call your app or language?
+- ``
 
-The part that sketchzone doesn't define, and that you must define in order to use sketchzone in your project, is the "inspector." Documents are loaded into the inspector from the editor by the inspector controller. If you're looking at a sketchzone webpage, it looks like this:
+# Structure
+
+Internally the thing the user edits is called a document, and the thing that you must define in order to use sketchzone in your project is the "inspector." These are the names that sketchzone uses to talk about itself:
 
 ```
 C /-------------------------------------\
-O | Tab1 x  Tab2 x  Tab3 x  Ta[+] Title |
-N | /--------\ /----------------------\ |
-F | | Editor | | Inspector controller | |
-I | |        | \----------------------/ |
-G | |        | /----------------------\ |
+o | Tab1 x  Tab2 x  Tab3 x  Ta[+] Logo  |
+n | /--------\ /----------------------\ |
+f | | Editor | | Inspector controller | |
+i | |        | \----------------------/ |
+g | |        | /----------------------\ |
   | |        | | Inspector            | |
-M | |        | |                      | |
-E | |        | |                      | |
-N | \--------/ \----------------------/ |
-U \-------------------------------------/
+m | |        | |                      | |
+e | |        | |                      | |
+n | \--------/ \----------------------/ |
+u \-------------------------------------/
 ```
 
-Sketches, visually, are the combination of the editor and inspector that switch between when you switch between tabs. Sketches, as data, are document + metadata (createdAt, etc), and ActiveSketches are data sketches + the runtime state of codemirror + runtime information for the inspector...
+The app assumes it has full control over the window, and that the body of the HTML document looks like this:
 
-# Configuration
+```html
+<body id="body-root">
+  <main id="main-root" class="config-menu-is-closed">
+    <div id="sketchzone-config"></div>
+    <div id="sketchzone-container">
+      <div id="sketchzone-header">
+        <div id="sketchzone-tabs"></div>
+        <div id="sketchzone-logo"></div>
+      </div>
+      <div id="sketchzone-active-sketch">
+        <div id="sketchzone-codemirror-root"></div>
+        <div id="sketchzone-divider"></div>
+        <div id="sketchzone-inspector-root">
+          <div id="sketchzone-inspector-controller" class="zone1"></div>
+          <div id="sketchzone-inspector-contents"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="modal-root"></div>
+</body>
+```
 
-Many CSS variables attached to the `<body>` element are intended to be overwritten.
+# Configuring Style
+
+Many CSS variables attached to the `<body>` element are intended to be modified for specific users of sketchzone.
 
 ## Style
 

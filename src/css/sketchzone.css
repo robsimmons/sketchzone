@@ -1,8 +1,8 @@
 /** DIMENSIONS **/
 
 body {
-  --sketchzone-mono: 'Fira Mono', monospace;
-  --sketchzone-ui: 'Fira Sans Condensed', sans-serif;
+  --sketchzone-mono: monospace;
+  --sketchzone-ui: sans-serif;
 
   --sketchzone-radius: 8px;
   --sketchzone-button-size: 2rem;
@@ -39,7 +39,6 @@ body {
   --sketchzone-dark-1-text: oklch(67% 0 0);
   --sketchzone-dark-1-active-button-background: oklch(32% 0 0);
   --sketchzone-dark-1-active-button-text: oklch(72% 0 0);
-  --sketchzone-dark-1-hint-text: oklch(47% 0 0); /* codemirror line numbers */
 
   /* Zone 2 is the desaturated area where the tab switcher lives */
   --sketchzone-dark-2-background: oklch(37% 0 0);
@@ -56,7 +55,6 @@ body {
   --sketchzone-light-1-text: oklch(57% 0 0);
   --sketchzone-light-1-active-button-background: oklch(92% 0 0);
   --sketchzone-light-1-active-button-text: oklch(52% 0 0);
-  --sketchzone-light-1-hint-text: oklch(77% 0 0); /* codemirror line numbers */
 
   --sketchzone-light-2-background: oklch(87% 0 0);
   --sketchzone-light-2-text: oklch(47% 0 0);
@@ -75,7 +73,6 @@ body {
   --sketchzone-1-text: var(--sketchzone-light-1-text);
   --sketchzone-1-active-button-background: var(--sketchzone-light-1-active-button-background);
   --sketchzone-1-active-button-text: var(--sketchzone-light-1-active-button-text);
-  --sketchzone-1-hint-text: var(--sketchzone-light-1-hint-text);
 
   --sketchzone-2-background: var(--sketchzone-light-2-background);
   --sketchzone-2-text: var(--sketchzone-light-2-text);
@@ -93,7 +90,6 @@ body {
     --sketchzone-1-text: var(--sketchzone-dark-1-text);
     --sketchzone-1-active-button-background: var(--sketchzone-dark-1-active-button-background);
     --sketchzone-1-active-button-text: var(--sketchzone-dark-1-active-button-text);
-    --sketchzone-1-hint-text: var(--sketchzone-dark-1-hint-text);
 
     --sketchzone-2-background: var(--sketchzone-dark-2-background);
     --sketchzone-2-text: var(--sketchzone-dark-2-text);
@@ -111,7 +107,6 @@ body.theme-light {
   --sketchzone-1-text: var(--sketchzone-light-1-text);
   --sketchzone-1-active-button-background: var(--sketchzone-light-1-active-button-background);
   --sketchzone-1-active-button-text: var(--sketchzone-light-1-active-button-text);
-  --sketchzone-1-hint-text: var(--sketchzone-light-1-hint-text);
 
   --sketchzone-2-background: var(--sketchzone-light-2-background);
   --sketchzone-2-text: var(--sketchzone-light-2-text);
@@ -128,7 +123,6 @@ body.theme-dark {
   --sketchzone-1-text: var(--sketchzone-dark-1-text);
   --sketchzone-1-active-button-background: var(--sketchzone-dark-1-active-button-background);
   --sketchzone-1-active-button-text: var(--sketchzone-dark-1-active-button-text);
-  --sketchzone-1-hint-text: var(--sketchzone-dark-1-hint-text);
 
   --sketchzone-2-background: var(--sketchzone-dark-2-background);
   --sketchzone-2-text: var(--sketchzone-dark-2-text);
@@ -189,24 +183,23 @@ button:hover {
 
 /* Config area outside of the rounded rect in zone 1 */
 #sketchzone-config {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: 1fr max-content;
+  gap: var(--sketchzone-small-padding);
   height: 100%;
-  padding-block: var(--dk-small-padding);
-  align-items: stretch;
+  padding: var(--sketchzone-small-padding);
+  align-items: start;
 }
 
-.sketchzone-config-menu {
-  display: flex;
-  flex-direction: column;
-  padding: var(--sketchzone-small-padding);
+.sketchzone-subconfig {
+  display: grid;
   gap: var(--sketchzone-small-padding);
 }
-.sketchzone-config-menu button {
+.sketchzone-subconfig button {
   width: calc(var(--sketchzone-button-size) + var(--sketchzone-small-padding));
   height: calc(var(--sketchzone-button-size) + var(--sketchzone-small-padding));
 }
-.sketchzone-config-menu svg {
+.sketchzone-subconfig svg {
   margin: auto;
 }
 .sketchzone-config-load-selections {
@@ -461,7 +454,7 @@ button:hover {
   caret-color: var(--sketchzone-1-text);
 }
 .cm-editor .cm-content {
-  font-family: var(--sketchzone-mono);
+  font: var(--sketchzone-mono);
 }
 .cm-gutter.cm-lineNumbers {
   width: 100%;
@@ -470,8 +463,7 @@ button:hover {
   background: transparent;
   width: 2rem;
   border: none;
-  font-family: var(--sketchzone-ui);
-  color: var(--sketchzone-1-hint-text);
+  color: var(--sessionzone-1-text)
 }
 
 /* Some default inspector styling */

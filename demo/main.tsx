@@ -1,10 +1,7 @@
-import ReactDOM from 'react-dom/client';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { EditorView, keymap, lineNumbers } from '@codemirror/view';
 
-import ConfigMenu from '../src/components/Config.tsx';
-import type { DOCUMENT } from '../src/document.js';
-import { setup } from '../src/main.js';
+import { DOCUMENT, Inspector, setup } from '../src/main.js';
 
 const lorem = (input: number | string) =>
   `
@@ -33,12 +30,19 @@ function getHTML(doc: DOCUMENT, loads: number) {
   </div>`;
 }
 
-function createAndMountInspector(root: HTMLDivElement, doc: DOCUMENT): void {
+function createAndMountInspector(root: HTMLDivElement, doc: DOCUMENT): Inspector {
   let loads = 1;
   root.innerHTML = getHTML(doc, loads);
+
+  return {
+    reload: async () => {
+      loads += 1;
+      root.innerHTML = getHTML(doc, loads);
+    },
+  };
 }
 
-const { db, restore, share } = await setup({
+await setup({
   createAndMountInspector,
   codemirrorExtensions: [
     lineNumbers(),
@@ -48,7 +52,5 @@ const { db, restore, share } = await setup({
   ],
   defaultEntries: [lorem(1), lorem(2), lorem(3)],
   appName: 'sketchzone',
+  infoUrl: 'https://github.com/robsimmons/sketchzone/',
 });
-
-const configRoot = ReactDOM.createRoot(document.getElementById('sketchzone-config')!);
-configRoot.render(<ConfigMenu db={db} restore={restore} share={share} documentName="document" />);

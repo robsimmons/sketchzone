@@ -134,7 +134,7 @@ Vertical height is determined by the following:
 
 ## Color scheme
 
-Light and dark mode both use 11 colors. The scheme here uses [OKLCH](https://oklch.com/) to maintain a consistency of relative perceptual brightness when switching between light and dark mode, while keeping text in a range that allows light mode to have vibrant and contrasting color schemes.
+Light and dark mode both use 10 colors. The scheme here uses [OKLCH](https://oklch.com/) to maintain a consistency of relative perceptual brightness when switching between light and dark mode, while keeping text in a range that allows light mode to have vibrant and contrasting color schemes.
 
 ```css
 body {
@@ -144,7 +144,6 @@ body {
   --sketchzone-dark-1-text: oklch(67% 0 0);
   --sketchzone-dark-1-active-button-background: oklch(32% 0 0);
   --sketchzone-dark-1-active-button-text: oklch(72% 0 0);
-  --sketchzone-dark-1-hint-text: oklch(47% 0 0); /* codemirror line numbers */
 
   /* Zone 2 is the desaturated area where the tab switcher lives */
   --sketchzone-dark-2-background: oklch(37% 0 0);
@@ -162,7 +161,6 @@ body {
   --sketchzone-light-1-text: oklch(57% 0 0);
   --sketchzone-light-1-active-button-background: oklch(92% 0 0);
   --sketchzone-light-1-active-button-text: oklch(52% 0 0);
-  --sketchzone-light-1-hint-text: oklch(77% 0 0);
 
   /* Zone 2 is the desaturated area where the tab switcher lives */
   --sketchzone-light-2-background: oklch(87% 0 0);
@@ -175,3 +173,4 @@ body {
   --sketchzone-light-overlay: oklch(52% 0 0 / 30%);
 }
 ```
+

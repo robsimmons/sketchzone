@@ -2,8 +2,8 @@ import { EditorState, Extension } from '@codemirror/state';
 import { EditorView, ViewUpdate } from '@codemirror/view';
 
 import type { DOCUMENT } from './document.js';
-import type { SketchObject } from './storage.js';
 import type { Inspector } from './implementer-types.js';
+import type { SketchObject } from './storage.js';
 
 const EDITOR_SYNC_DEBOUNCE_MS = 250;
 

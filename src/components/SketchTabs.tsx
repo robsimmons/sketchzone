@@ -1,4 +1,5 @@
 import { Cross2Icon, PlusIcon } from '@radix-ui/react-icons';
+
 import type { TabsObject } from '../storage.js';
 
 interface Props {

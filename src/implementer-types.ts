@@ -76,6 +76,13 @@ export interface SetupProps {
    * document.
    */
   defaultEntries?: DOCUMENT[];
+
+  /**
+   * Where should the circle-question-mark button in the upper left go?
+   *
+   * Option: if omitted, there won't be a circle-question-mark button.
+   */
+  infoUrl?: string;
 }
 
 export interface Inspector {

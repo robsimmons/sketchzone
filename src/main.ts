@@ -1,14 +1,17 @@
-import { UrlHashAction, decodeUrlHashAction, encodeUrlHashAction } from './hash-action.js';
+import React from 'react';
 import ReactDOM from 'react-dom/client';
 import type { Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 
 import ActiveSketch from './active-sketch.js';
+import ConfigMenu from './components/ConfigMenu.js';
 import holdForModal from './components/HoldingModal.js';
 import InspectorController from './components/InspectorController.js';
 import setupDivider from './components/Divider.js';
 import SketchTabs from './components/SketchTabs.js';
 import type { DOCUMENT } from './document.js';
+import { UrlHashAction, decodeUrlHashAction, encodeUrlHashAction } from './hash-action.js';
+import type { Inspector, SetupProps } from './implementer-types.js';
 import {
   SKETCHES_DB,
   SketchObject,
@@ -20,8 +23,6 @@ import {
   storeSketch,
   storeTabs,
 } from './storage.js';
-import type { Inspector, SetupProps } from './implementer-types.js';
-import { render } from 'react-dom';
 
 const ICON_SIZE = '24px';
 
@@ -59,6 +60,7 @@ async function setupEditorInteractions(
   codemirrorExtensions: Extension[],
   documentName: string,
   title: string,
+  infoUrl: undefined | string,
   db: IDBDatabase,
   initialTabs: TabsObject,
   initialSketch: SketchObject,
@@ -139,17 +141,19 @@ async function setupEditorInteractions(
         ? 'modified'
         : 'loaded';
     inspectorControllerRoot.render(
-      InspectorController({
-        state,
-        iconSize: ICON_SIZE,
-        onLoad: async () => {
-          await displayedSketch.current.load(
-            displayedSketch.current.codemirrorState.doc.toString(),
-          );
-          setTimeout(renderInspectorController);
-        },
-        documentName,
-      }),
+      React.createElement(() =>
+        InspectorController({
+          state,
+          iconSize: ICON_SIZE,
+          onLoad: async () => {
+            await displayedSketch.current.load(
+              displayedSketch.current.codemirrorState.doc.toString(),
+            );
+            setTimeout(renderInspectorController);
+          },
+          documentName,
+        }),
+      ),
     );
   }
 
@@ -157,13 +161,15 @@ async function setupEditorInteractions(
   const tabsRoot = ReactDOM.createRoot(document.getElementById('sketchzone-tabs')!);
   function renderSketchTabs() {
     tabsRoot.render(
-      SketchTabs({
-        tabs: tabs.current,
-        iconSize: ICON_SIZE,
-        switchToIndex,
-        deleteIndex,
-        create: createSketch,
-      }),
+      React.createElement(() =>
+        SketchTabs({
+          tabs: tabs.current,
+          iconSize: ICON_SIZE,
+          switchToIndex,
+          deleteIndex,
+          create: createSketch,
+        }),
+      ),
     );
   }
 
@@ -292,51 +298,60 @@ async function setupEditorInteractions(
     renderSketchTabs();
   }
 
+  const configRoot = ReactDOM.createRoot(document.getElementById('sketchzone-config')!);
+
   /** GO! **/
-  restoreFromTabs();
+  configRoot.render(
+    React.createElement(() =>
+      ConfigMenu({
+        db,
+        documentName,
+        infoUrl,
+        restore: async (sketchKey: IDBValidKey) => {
+          let found = false;
+          for (const [index, { key }] of tabs.current.sketches.entries()) {
+            if (key === sketchKey) {
+              tabs.current.displayedSketchIndex = index;
+              found = true;
+              break;
+            }
+          }
 
-  return {
-    restore: async (sketchKey: IDBValidKey) => {
-      let found = false;
-      for (const [index, { key }] of tabs.current.sketches.entries()) {
-        if (key === sketchKey) {
-          tabs.current.displayedSketchIndex = index;
-          found = true;
-          break;
-        }
-      }
+          if (!found) {
+            const sketchStore = db.transaction([SKETCHES_DB], 'readonly').objectStore(SKETCHES_DB);
+            const rememberedSketch = await getSketch(sketchStore, sketchKey);
+            tabs.current = {
+              displayedSketchIndex: tabs.current.sketches.length,
+              sketches: tabs.current.sketches.concat([
+                new ActiveSketch(
+                  sketchKey,
+                  rememberedSketch,
+                  createAndMountInspector,
+                  codemirrorExtensions,
+                  triggerRedraw,
+                  triggerStorage,
+                  extractTitleFromDoc,
+                ),
+              ]),
+            };
+          }
 
-      if (!found) {
-        const sketchStore = db.transaction([SKETCHES_DB], 'readonly').objectStore(SKETCHES_DB);
-        const rememberedSketch = await getSketch(sketchStore, sketchKey);
-        tabs.current = {
-          displayedSketchIndex: tabs.current.sketches.length,
-          sketches: tabs.current.sketches.concat([
-            new ActiveSketch(
-              sketchKey,
-              rememberedSketch,
-              createAndMountInspector,
-              codemirrorExtensions,
-              triggerRedraw,
-              triggerStorage,
-              extractTitleFromDoc,
-            ),
-          ]),
-        };
-      }
-
-      await restoreFromTabs();
-    },
-    share: async () => {
-      window.location.hash = await encodeUrlHashAction({
-        t: 'open',
-        document: displayedSketch.current.codemirrorState.doc.toString(),
-      });
-      return window.location.toString();
-    },
-    db,
-  };
+          await restoreFromTabs();
+        },
+        share: async () => {
+          window.location.hash = await encodeUrlHashAction({
+            t: 'open',
+            document: displayedSketch.current.codemirrorState.doc.toString(),
+          });
+          return window.location.toString();
+        },
+      }),
+    ),
+  );
+  await restoreFromTabs();
 }
+
+export type { DOCUMENT, Inspector, SetupProps };
 
 export async function setup(options: SetupProps) {
   // Set up storage
@@ -364,13 +379,14 @@ export async function setup(options: SetupProps) {
   setupDivider();
 
   // Set up the hairy ball of multiple-sketch-management wax
-  return await setupEditorInteractions(
+  await setupEditorInteractions(
     emptyDocument,
     extractTitleFromDoc,
     options.createAndMountInspector,
     options.codemirrorExtensions,
     options.documentName ?? 'document',
     title,
+    options.infoUrl,
     db,
     tabs,
     sketch,

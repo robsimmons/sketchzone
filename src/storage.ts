@@ -4,6 +4,8 @@ import type { UrlHashAction } from './hash-action.js';
 export const SKETCHES_DB = 'sketches';
 export const TABS_DB = 'tabs';
 
+/* IndexedDB backing for sketch storage */
+
 export type TabsObject = {
   sketches: { key: IDBValidKey; title: string }[];
   displayedSketchIndex: number; // 0 <= displayedSketchIndex < sketches.length

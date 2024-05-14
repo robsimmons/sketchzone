@@ -8,7 +8,6 @@ interface Props {
 }
 
 export default function InspectorController({ state, iconSize, onLoad, documentName }: Props) {
-  console.log(`rendering ${state}`)
   return (
     <>
       <button

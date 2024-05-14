@@ -23,6 +23,7 @@ I highly recommend using your own codemirror extensions rather than relying on t
 ```javascript
 import { EditorView, keymap, lineNumbers } from '@codemirror/view';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
+
 const codemirrorExtensions = [
   lineNumbers(),
   history(),

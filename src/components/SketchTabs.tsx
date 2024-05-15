@@ -7,8 +7,8 @@ import type { TabsObject } from '../storage.js';
 interface Props {
   tabs: TabsObject;
   iconSize: string;
-  switchToIndex: (index: number) => void;
-  deleteIndex: (index: number) => void;
+  switchToIndex: (index: number) => Promise<void>;
+  deleteIndex: (index: number) => Promise<void>;
   create: () => void;
   documentName: string;
 }

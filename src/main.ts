@@ -175,16 +175,26 @@ async function setupEditorInteractions(
     );
   }
 
-  function switchToIndex(index: number) {
+  async function switchToIndex(index: number) {
+    if (index === tabs.current.displayedSketchIndex) return;
     tabs.current = {
       displayedSketchIndex: index,
       sketches: tabs.current.sketches,
     };
+    await displayedSketch.current.blur();
     restoreFromTabs();
   }
 
   async function deleteIndex(index: number) {
     if (tabs.current.sketches.length === 1) return;
+
+    const sketchToRemove = tabs.current.sketches[index];
+    if (displayedSketch.current === sketchToRemove) {
+      await sketchToRemove.blur();
+      await sketchToRemove.terminate();
+    } else if (sketchToRemove.active) {
+      await sketchToRemove.terminate();
+    }
 
     let displayedSketchIndex;
     if (index === tabs.current.displayedSketchIndex) {
@@ -227,22 +237,26 @@ async function setupEditorInteractions(
       ]),
     };
 
+    await displayedSketch.current.blur();
     restoreFromTabs();
   }
 
   /** RESTORING SKETCH STATUS **/
+  /**
+   * There's a hairy precondition for this function: if we're switching away from the current
+   * sketch, the current sketch needs to *already* have blur() called on it, and if we're
+   * removing a sketch, that sketch already needs to have terminate() called on it.
+   */
   async function restoreFromTabs() {
     const tx = db.transaction([TABS_DB, SKETCHES_DB], 'readwrite');
     const tabsStore = tx.objectStore(TABS_DB);
     const sketchStore = tx.objectStore(SKETCHES_DB);
     await storeTabs(tabsStore, extractTabsForStorage());
 
-    if (displayedSketch.current !== tabs.current.sketches[tabs.current.displayedSketchIndex]) {
-      await displayedSketch.current.blur();
-      if (!tabs.current.sketches.some((sketch) => sketch.key === displayedSketch.current.key)) {
-        await displayedSketch.current.terminate();
-      }
-
+    if (displayedSketch.current === tabs.current.sketches[tabs.current.displayedSketchIndex]) {
+      // Simple case: we haven't changed the displayed sketch
+      triggerRedraw();
+    } else {
       const rememberedSketch = await getSketch(
         sketchStore,
         tabs.current.sketches[tabs.current.displayedSketchIndex].key,
@@ -275,6 +289,7 @@ async function setupEditorInteractions(
           }
         }
       } else {
+        // sketchToRestore.active === false
         displayedSketch.current = new ActiveSketch(
           sketchToRestore.key,
           rememberedSketch,
@@ -287,8 +302,8 @@ async function setupEditorInteractions(
         tabs.current.sketches[tabs.current.displayedSketchIndex] = displayedSketch.current;
         view.setState(displayedSketch.current.codemirrorState);
       }
+      triggerRedraw();
     }
-    triggerRedraw();
   }
 
   function triggerRedraw() {
@@ -338,6 +353,7 @@ async function setupEditorInteractions(
             };
           }
 
+          displayedSketch.current.blur();
           await restoreFromTabs();
         },
         share: async () => {

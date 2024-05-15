@@ -36,8 +36,14 @@ const codemirrorExtensions = [
 
 These examples are all built on Glitch as a static site that uses [Vite](https://vitejs.dev/) to roll up sessionzone's dependencies on React and Codemirror.
 
-- [Simplest possible example](https://glitch.com/edit/?#!/sketchzone-simplest?path=index.js) - almost simple enough to be deceiving, uses defaults for everything. Loading a document just displays its length.
-- []
+- [Simplest possible example](https://glitch.com/edit/#!/sketchzone-simplest?path=index.js) - deceptively simple enough, uses defaults for everything. Loading a document just displays its length.
+- [Simple example](https://glitch.com/edit/#!/sketchzone-simple?path=index.js) - a better example of a basic configuration, which uses a button to show off how tabs maintain their own inspectors.
+- [Simple example (react)](https://glitch.com/edit/#!/sketchzone-simple-react?path=index.jsx) - sketchzone works really well with writing a simple inspector in React. This is exactly the same as the last simple example, but built with React instead of injecting using `innerHTML` to slam a bunch of HTML into the document.
+
+By returning an object from the `createAndMountInspector()` function, the behavior of sketchzone can be configured to support a couple of different uses cases:
+
+- [Using unmount() to always unload](https://glitch.com/edit/#!/sketchzone-always-unload?path=index.jsx)
+- [Using terminate() to reclaim resources]()
 
 # Structure
 

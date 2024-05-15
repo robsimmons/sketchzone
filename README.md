@@ -40,10 +40,12 @@ These examples are all built on Glitch as a static site that uses [Vite](https:/
 - [Simple example](https://glitch.com/edit/#!/sketchzone-simple?path=index.js) - a better example of a basic configuration, which uses a button to show off how tabs maintain their own inspectors.
 - [Simple example (react)](https://glitch.com/edit/#!/sketchzone-simple-react?path=index.jsx) - sketchzone works really well with writing a simple inspector in React. This is exactly the same as the last simple example, but built with React instead of injecting using `innerHTML` to slam a bunch of HTML into the document.
 
-By returning an object from the `createAndMountInspector()` function, the behavior of sketchzone can be configured to support a couple of different uses cases:
+By returning an object containing 1-4 functions from the `createAndMountInspector()` function, the behavior of sketchzone can be configured to support a couple of different uses cases:
 
-- [Using unmount() to always unload](https://glitch.com/edit/#!/sketchzone-always-unload?path=index.jsx)
-- [Using terminate() to reclaim resources]()
+- [Using unmount() to always unload](https://glitch.com/edit/#!/sketchzone-always-unload?path=index.jsx) - the `unmount()` function is called whenever you are about to stop viewing an inspector, and in this example, we return a truthy value from the unmount() function so that sketchzone will terminate and destroy the inspector.
+- [Using destroy() to reclaim resources](https://glitch.com/edit/#!/sketchzone-cleanup?path=index.jsx) - if an inspector uses resources that need to be reclaimed when the tab is closed for good, that can be done in the `destroy()` function.
+- [Using reload() to stick around](https://glitch.com/edit/#!/sketchzone-reload?path=index.jsx) - the default behavior is to unmount, destroy, and re-initialize an inspector whenever the reload button is pressed. It's possible to keep the inspector around by defining `reload()`
+- [Using unmount() and remount() to pause](https://glitch.com/edit/#!/sketchzone-reload?path=index.jsx) - having `unmount()` return `true` can keep tabs that aren't open from consuming resources, but if you want to do a little bit more work to tell the inspector how to suspend itself when it's unmounted, and then resume when it's remounted, it's possible to conserve resources without deleting all the user's state.
 
 # Structure
 

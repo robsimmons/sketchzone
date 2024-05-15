@@ -2,13 +2,13 @@
 
 You want to create a little inspector for your programming language or data structure or something: your user writes some text document and you will use your "inspector" to show them something --- some JavaScript widget that will render something based on the text the user provided provided.
 
-The sketchzone package is intended to encapsulate a bunch of "price of entry" quality-of-life issues that a browser-based implementation of such a tool is going to encounter. You provide the inspector, and sketchzone provides:
+I talked more about the motivation behind sketchzone in [this blog post](https://typesafety.net/rob/blog/endless-sketchzone). The sketchzone package is intended to encapsulate a bunch of "price of entry" quality-of-life issues that a browser-based implementation of such a tool is going to encounter. You provide the inspector, and sketchzone provides:
 
 - Codemirror integration for the editor
-- Persistance of multiple sketches via IndexedDB
+- Persistance of multiple sketches via [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API)
 - Multiple tabs
 - Browse/reopen closed documents
-- Sharing links using URL hashes
+- Sharable links using URL hashes
 - A mobile-friendly mode that switches between the editor and inspector
 - Light/dark mode
 

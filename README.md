@@ -98,8 +98,9 @@ Many CSS variables attached to the `<body>` element are intended to be modified 
 
 ```css
 body {
-  --sketchzone-mono: 'Fira Mono', monospace;
-  --sketchzone-ui: 'Fira Sans Condensed', sans-serif;
+  --sketchzone-mono-font-family: 'Fira Mono', monospace;
+  --sketchzone-ui-font-family: 'Fira Sans Condensed', sans-serif;
+  --sketchzone-line-numbers-font-family: var(--sketchzone-mono);
   --sketchzone-radius: 8px;
   --sketchzone-button-size: 2rem;
 }

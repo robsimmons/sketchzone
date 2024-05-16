@@ -1,8 +1,9 @@
 /** DIMENSIONS **/
 
 body {
-  --sketchzone-mono: monospace;
-  --sketchzone-ui: sans-serif;
+  --sketchzone-mono-font-family: monospace;
+  --sketchzone-ui-font-family: sans-serif;
+  --sketchzone-line-numbers-font-family: var(--sketchzone-mono);
 
   --sketchzone-radius: 8px;
   --sketchzone-button-size: 2rem;
@@ -137,7 +138,7 @@ body.theme-dark {
 
 /* Roots - body and main */
 body {
-  font-family: var(--sketchzone-ui);
+  font-family: var(--sketchzone-ui-font-family);
   background-color: var(--sketchzone-1-background);
   color: var(--sketchzone-1-text);
 
@@ -453,16 +454,17 @@ button:hover {
   caret-color: var(--sketchzone-1-text);
 }
 .cm-editor .cm-content {
-  font: var(--sketchzone-mono);
+  font-family: var(--sketchzone-mono-font-family);
 }
 .cm-gutter.cm-lineNumbers {
   width: 100%;
+  font-family: var(--sketchzone-line-numbers-font-family);
 }
 .cm-editor .cm-gutters {
   background: transparent;
   width: 2rem;
   border: none;
-  color: var(--sessionzone-1-text)
+  color: var(--sessionzone-1-text);
 }
 
 /* Some default inspector styling */

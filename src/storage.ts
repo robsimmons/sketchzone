@@ -83,10 +83,40 @@ export async function initializeStorage(
       // This will be fixed by either adding default entries or by adding the document from the hashAction.
       const tabs: TabsObject = { displayedSketchIndex: 0, sketches: [] };
 
-      // TODO: Check for legacy localStorage data and add that to the database if need be
+      // This while if-statement can be deleted after JUNE 2024
+      // It grabs all the entries for the Dusa editor to facilitate migrating dusa.rocks to sketchzone
+      if (localStorage.getItem('dusa-sessions')) {
+        const programs: { [uuid: string]: { title: string; key: IDBValidKey } } = {};
+        for (let i = 0; i < localStorage.length; i++) {
+          const prefix = 'dusa-session-';
+          const key = localStorage.key(i);
+          if (key?.startsWith(prefix)) {
+            const uuid = key.slice(prefix.length);
+            const program = localStorage.getItem(key)!;
+            programs[uuid] = {
+              title: extractTitleFromDoc(program),
+              key: await addSketch(sketchStore, {
+                document: program,
+                createdAt: now,
+                updatedAt: now,
+              }),
+            };
+          }
+        }
 
-      // If there's no hashAction, add the default entries to the store and the tabs
-      if (hashAction === null) {
+        tabs.sketches = localStorage
+          .getItem('dusa-sessions')!
+          .split(',')
+          .map((uuid): undefined | { title: string; key: IDBValidKey } => programs[uuid])
+          .filter((elem): elem is { title: string; key: IDBValidKey } => elem !== undefined);
+      }
+
+      if (
+        hashAction === null &&
+        tabs.sketches.length === 0 // this check is redundant when the localStorage logic above is removed
+      ) {
+        // If there's no hashAction, add the default entries to the store and the tabs
+
         tabs.sketches = await Promise.all(
           defaultEntries.map(async (entry) => ({
             title: extractTitleFromDoc(entry),

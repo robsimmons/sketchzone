@@ -3,7 +3,7 @@
 body {
   --sketchzone-mono-font-family: monospace;
   --sketchzone-ui-font-family: sans-serif;
-  --sketchzone-line-numbers-font-family: var(--sketchzone-mono);
+  --sketchzone-line-numbers-font-family: var(--sketchzone-mono-font-family);
 
   --sketchzone-radius: 8px;
   --sketchzone-button-size: 2rem;

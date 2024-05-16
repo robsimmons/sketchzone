@@ -1,4 +1,4 @@
-name: Check that the project builds
+name: Build
 
 on:
   push:

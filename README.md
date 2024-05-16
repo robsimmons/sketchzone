@@ -1,5 +1,8 @@
 # sketchzone
 
+![Build passing](https://github.com/robsimmons/sketchzone/actions/workflows/compile.yml/badge.svg)
+[![NPM Module](https://img.shields.io/npm/v/sketchzone.svg)](https://www.npmjs.com/package/sketchzone)
+
 You want to create a little inspector for your programming language or data structure or something: your user writes some text document and you will use your "inspector" to show them something --- some JavaScript widget that will render something based on the text the user provided provided.
 
 I talked more about the motivation behind sketchzone in [this blog post](https://typesafety.net/rob/blog/endless-sketchzone). The sketchzone package is intended to encapsulate a bunch of "price of entry" quality-of-life issues that a browser-based implementation of such a tool is going to encounter. You provide the inspector, and sketchzone provides:

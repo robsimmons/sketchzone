@@ -50,6 +50,8 @@ By returning an object containing 1-4 functions from the `createAndMountInspecto
 - [Using reload() to stick around](https://glitch.com/edit/#!/sketchzone-reload?path=index.jsx) - the default behavior is to unmount, destroy, and re-initialize an inspector whenever the reload button is pressed. It's possible to keep the inspector around by defining `reload()`
 - [Using unmount() and remount() to pause](https://glitch.com/edit/#!/sketchzone-pausing?path=index.jsx) - having `unmount()` return `true` can keep tabs that aren't open from consuming resources, but if you want to do a little bit more work to tell the inspector how to suspend itself when it's unmounted, and then resume when it's remounted, it's possible to conserve resources without deleting all the user's state.
 
+All those examples have the same index.html file. It's also possible to change the index.html file to add custom fonts and styles. That's demonstrated on [github here](https://github.com/robsimmons/sketchzone-disco) and [deployed here](https://sketchzone.disco.typesafety.net/) with [Disco](https://letsdisco.dev/).
+
 # Structure
 
 Internally the thing the user edits is called a document, and the thing that you must define in order to use sketchzone in your project is the "inspector." These are the names that sketchzone uses to talk about itself:

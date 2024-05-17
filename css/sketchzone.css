@@ -6,7 +6,7 @@ body {
   --sketchzone-line-numbers-font-family: var(--sketchzone-mono-font-family);
 
   --sketchzone-radius: 8px;
-  --sketchzone-button-size: 2rem;
+  --sketchzone-button-height: 2rem;
 
   --sketchzone-outer-padding: 12px;
   --sketchzone-small-padding: 8px;
@@ -20,7 +20,12 @@ body {
 
   --sketchzone-sketch-height: calc(
     100vh - 2 * var(--sketchzone-outer-padding) - 2 * var(--sketchzone-small-padding) -
-      var(--sketchzone-button-size) - var(--sketchzone-tab-bottom-padding)
+      var(--sketchzone-button-height) - var(--sketchzone-tab-bottom-padding)
+  );
+
+  --sketchzone-inspector-height: calc(
+    var(--sketchzone-sketch-height) - var(--sketchzone-button-height) -
+      var(--sketchzone-small-padding)
   );
 }
 @media (max-width: 650px) {
@@ -149,7 +154,7 @@ main {
   width: 100%;
   min-height: 100%;
   display: grid;
-  grid-template-columns: calc(var(--sketchzone-button-size) + 3 * var(--sketchzone-small-padding)) 1fr;
+  grid-template-columns: calc(var(--sketchzone-button-height) + 3 * var(--sketchzone-small-padding)) 1fr;
 }
 
 /* Buttons
@@ -161,7 +166,7 @@ main {
 button {
   border: 0;
   border-radius: var(--sketchzone-radius);
-  height: var(--sketchzone-button-size);
+  height: var(--sketchzone-button-height);
   padding-inline: var(--sketchzone-small-padding);
   background-color: var(--sketchzone-2-background);
   color: var(--sketchzone-2-text);
@@ -197,8 +202,8 @@ button:hover {
   gap: var(--sketchzone-small-padding);
 }
 .sketchzone-subconfig button {
-  width: calc(var(--sketchzone-button-size) + var(--sketchzone-small-padding));
-  height: calc(var(--sketchzone-button-size) + var(--sketchzone-small-padding));
+  width: calc(var(--sketchzone-button-height) + var(--sketchzone-small-padding));
+  height: calc(var(--sketchzone-button-height) + var(--sketchzone-small-padding));
 }
 .sketchzone-subconfig svg {
   margin: auto;
@@ -349,9 +354,16 @@ button:hover {
 }
 
 /* Sketch Part 3: Inspector */
+#sketchzone-inspector-root {
+  height: var(--sketchzone-sketch-height);
+  display: grid;
+  grid-template-rows: var(--sketchzone-button-height) var(--sketchzone-sketch-height);
+  gap: var(--sketchzone-small-padding);
+}
+
 #sketchzone-inspector-controller {
   background-color: var(--sketchzone-1-background);
-  height: var(--sketchzone-button-size);
+  height: var(--sketchzone-button-height);
   box-shadow: var(--sketchzone-box-shadow);
   border-radius: var(--sketchzone-radius);
   display: flex;
@@ -359,7 +371,7 @@ button:hover {
   overflow-x: hidden;
 }
 #sketchzone-inspector-contents {
-  height: calc(var(--sketchzone-sketch-height) - var(--sketchzone-button-size));
+  height: var(--sketchzone-inspector-height);
   display: grid;
 }
 
@@ -385,7 +397,7 @@ button:hover {
     grid-template-areas: 'viewer' 'editor';
     gap: var(--sketchzone-small-padding);
     --sketchzone-text-editor-height: calc(
-      var(--sketchzone-sketch-height) - var(--sketchzone-button-size) -
+      var(--sketchzone-sketch-height) - var(--sketchzone-button-height) -
         var(--sketchzone-small-padding)
     );
   }
@@ -464,15 +476,16 @@ button:hover {
   background: transparent;
   width: 2rem;
   border: none;
-  color: var(--sessionzone-1-text);
+  color: var(--sketchzone-1-text);
 }
 
 /* Some default inspector styling */
 .sketchzone-rounded-inspector {
-  margin-top: var(--sketchzone-small-padding);
+  height: var(--sketchzone-inspector-height);
   border-radius: var(--sketchzone-radius);
   box-shadow: var(--sketchzone-box-shadow);
   background-color: var(--sketchzone-1-background);
   color: var(--sketchzone-1-text);
   padding: var(--sketchzone-large-padding);
+  overflow: scroll;
 }

@@ -21,6 +21,7 @@ export default function InspectorController({ state, iconSize, onLoad, documentN
             'active-sketch-is-showing-inspector';
           onLoad();
         }}
+        className={state === 'modified' ? 'sketchzone-inspector-load-modified' : undefined}
       >
         <EnterIcon width={iconSize} height={iconSize} />
         {state === 'unloaded'

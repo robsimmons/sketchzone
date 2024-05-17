@@ -1,6 +1,6 @@
 {
   "name": "sketchzone",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "type": "module",
   "main": "lib/main.js",
   "types": "lib/main.d.ts",

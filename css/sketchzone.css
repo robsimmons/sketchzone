@@ -405,6 +405,11 @@ button:hover {
     grid-template-areas: 'viewer';
   }
 
+  div#sketchzone-active-sketch.active-sketch-is-showing-editor #sketchzone-inspector-root {
+    height: var(--sketchzone-button-height);
+    --sketchzone-sketch-height: 0;
+    gap: 0;
+  }
   div#sketchzone-active-sketch.active-sketch-is-showing-editor #sketchzone-inspector-contents {
     display: none;
   }

@@ -19,7 +19,7 @@ This is fundamentally made for an audience of one (me), but [reach out](https://
 
 ## Implementing an inspector
 
-Your job if you're using this library is to implement the types in [impelementer-types.ts](src/implementer-types.ts). Specifically, you need to provide a function `createAndMountInspector` that takes a DOM element and a string document, creates and mounts the inspector to the given DOM element, and optionally returns an `Inspector` object.
+Your job if you're using this library is to implement the types in [implementer-types.ts](src/implementer-types.ts). Specifically, you need to provide a function `createAndMountInspector` that takes a DOM element and a string document, creates and mounts the inspector to the given DOM element, and optionally returns an `Inspector` object.
 
 I highly recommend using your own codemirror extensions rather than relying on the defaults:
 
